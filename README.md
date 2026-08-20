@@ -49,10 +49,10 @@ This is a comprehensive web-based business application designed for Badminton Co
 
 ## 5. Test Accounts
 - **Admin Account:** 
-  - Email: `superadmin@smashhub.vn` (Hoặc email admin của bạn trong Database)
+  - Email: `admin@badminton.vn` (Hoặc `admin@badminton.com`)
   - Password: `123456`
 - **Customer Account:**
-  - Email: `an.nguyen@email.com`
+  - Email: `nva@example.com`
   - Password: `123456`
 
 ## 6. Third-Party Libraries & Assets
