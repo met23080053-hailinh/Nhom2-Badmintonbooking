@@ -1,5 +1,5 @@
-# Badminton Booking & Management System
-**Final Examination Project - HSB2006 Developing Business Applications**
+# MET5 - 23080053- ĐỖ HẢI LINH - NHÓM 2
+**Badminton Booking & Management System (Final Project)**
 
 ## 1. Project Purpose & Executive Summary
 This is a comprehensive web-based business application designed for Badminton Court Owners and Players. It solves the real-world business problem of manual court reservations, scattered matchmaking, and inefficient payment tracking. 
@@ -29,7 +29,7 @@ This is a comprehensive web-based business application designed for Badminton Co
 1. **Database Import:**
    - Open phpMyAdmin (usually `http://localhost/phpmyadmin`).
    - Create a new database named `badminton_booking_db`.
-   - Import the provided file `HSB2006_MET4_<StudentID>_<FullName>_Database.sql`.
+   - Import the provided file `HSB2006_MET5_23080053_DoHaiLinh_Database.sql`.
    *(Note: The database contains all schema and sample data required for assessment).*
 
 2. **Backend Setup:**
@@ -66,4 +66,4 @@ This is a comprehensive web-based business application designed for Badminton Co
 - Real-time WebSockets are not used; the dashboard updates on mount or via action triggers.
 
 ---
-*This repository and application are submitted as the final examination requirement for VNU HSB2006.*
+*This repository and application are submitted as the final examination requirement for VNU HSB2006 - MET5.*
