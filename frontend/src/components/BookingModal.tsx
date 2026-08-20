@@ -143,7 +143,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     const startTimeStr = timeParts[0] + ':00';
     const endTimeStr = timeParts[1] + ':00'; // Simply using the first slot for simplicity of API demo
 
-    fetch(`http://${window.location.hostname}:8000/create_booking.php`, {
+    fetch(`https://cau-long.rf.gd/backend/create_booking.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -750,3 +750,5 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     </>
   );
 };
+
+

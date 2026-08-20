@@ -7,7 +7,7 @@ export const NewsView: React.FC = () => {
   const [newsList, setNewsList] = React.useState<any[]>([]);
 
   React.useEffect(() => {
-    fetch(`http://${window.location.hostname}:8000/get_news.php`)
+    fetch(`https://cau-long.rf.gd/backend/get_news.php`)
       .then(res => res.json())
       .then(data => {
         if(data.status === 'success') {
@@ -56,3 +56,5 @@ export const NewsView: React.FC = () => {
     </div>
   );
 };
+
+

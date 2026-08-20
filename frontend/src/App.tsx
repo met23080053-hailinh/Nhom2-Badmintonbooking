@@ -81,7 +81,7 @@ export default function App() {
   }, [userRole]);
 
   // React.useEffect(() => {
-  //   fetch(`http://${window.location.hostname}:8000/get_courts.php`)
+  //   fetch(`https://cau-long.rf.gd/backend/get_courts.php`)
   //     .then(res => res.json())
   //     .then(data => {
   //       if(data.status === 'success') {
@@ -95,7 +95,7 @@ export default function App() {
   // Tự động gọi API nhắc lịch (Cronjob mô phỏng) mỗi 1 phút (60000ms)
   React.useEffect(() => {
     const intervalId = setInterval(() => {
-      fetch(`http://${window.location.hostname}:8000/reminder_cron.php`)
+      fetch(`https://cau-long.rf.gd/backend/reminder_cron.php`)
         .then(res => res.text())
         .then(text => {
           console.log("[Hệ Thống Nhắc Lịch Tự Động]:\n" + text);
@@ -153,7 +153,7 @@ export default function App() {
     const mysqlEndTime = `${today} ${endTimeStr}:00`;
 
     // 2. Gửi dữ liệu thật về Backend PHP
-    fetch(`http://${window.location.hostname}:8000/create_booking.php`, {
+    fetch(`https://cau-long.rf.gd/backend/create_booking.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -230,7 +230,7 @@ export default function App() {
     }));
 
     if (id) {
-      fetch(`http://${window.location.hostname}:8000/get_bookings.php?user_id=${id}`)
+      fetch(`https://cau-long.rf.gd/backend/get_bookings.php?user_id=${id}`)
         .then(res => res.json())
         .then(data => {
           if(data.status === 'success') {
@@ -518,3 +518,4 @@ export default function App() {
     </div>
   );
 }
+

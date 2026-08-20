@@ -118,3 +118,5 @@ export interface FilterOptions {
   amenities: string[];
   minRating: number;
 }
+
+

@@ -11,3 +11,5 @@ export const INITIAL_BOOKINGS: Booking[] = [
     status: 'confirmed',
   }
 ];
+
+

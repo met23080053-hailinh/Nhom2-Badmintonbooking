@@ -62,7 +62,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       : { email: email, password: password };
 
     try {
-      const response = await fetch(`http://${window.location.hostname}:8000/${endpoint}`, {
+      const response = await fetch(`https://cau-long.rf.gd/backend/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -92,7 +92,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
     setError('');
     try {
-      const response = await fetch(`http://${window.location.hostname}:8000/google_login.php`, {
+      const response = await fetch(`https://cau-long.rf.gd/backend/google_login.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential })
@@ -116,7 +116,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch(`http://${window.location.hostname}:8000/facebook_login.php`, {
+      const res = await fetch(`https://cau-long.rf.gd/backend/facebook_login.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accessToken: response.accessToken })
@@ -336,3 +336,5 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     </div>
   );
 }
+
+
