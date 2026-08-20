@@ -40,7 +40,7 @@ CREATE TABLE `courts` (
   `closing_time` time NOT NULL DEFAULT '22:00:00',
   `status` enum('AVAILABLE','MAINTENANCE') DEFAULT 'AVAILABLE',
   `description` text DEFAULT NULL,
-  `images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`images`)),
+  `images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
