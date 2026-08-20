@@ -14,17 +14,17 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'OPTIONS'
 header("Content-Type: application/json; charset=UTF-8");
 
 // Thông tin kết nối Database
-$host = '127.0.0.1';
-$db_name = 'badminton_booking_db';
-$username = 'root'; // Tài khoản mặc định của XAMPP
-$password = '';     // XAMPP mặc định không có mật khẩu
+$host = 'sql308.infinityfree.com';
+$db_name = 'if0_42645833_badmintonbooking';
+$username = 'if0_42645833'; 
+$password = 'Hailinh12340';     
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db_name;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false, // Ép hệ thống dùng Prepared Statements thực sự
+    PDO::ATTR_EMULATE_PREPARES   => false, 
 ];
 
 try {
