@@ -15,36 +15,15 @@ export const Hero: React.FC<HeroProps> = ({
 }) => {
   const [selectedCity, setSelectedCity] = useState('Hà Nội');
   const [selectedDistrict, setSelectedDistrict] = useState('Tất cả các Quận');
-  const [selectedDate, setSelectedDate] = useState('Hôm nay, 24 Th10');
-  const [selectedTime, setSelectedTime] = useState('Bất kỳ lúc nào');
 
   const [openDistrictDropdown, setOpenDistrictDropdown] = useState(false);
-  const [openDateDropdown, setOpenDateDropdown] = useState(false);
-  const [openTimeDropdown, setOpenTimeDropdown] = useState(false);
-
-  const datesList = [
-    'Hôm nay, 24 Th10',
-    'Ngày mai, 25 Th10',
-    'Thứ Bảy, 26 Th10',
-    'Chủ Nhật, 27 Th10',
-    'Thứ Hai, 28 Th10',
-    'Thứ Ba, 29 Th10',
-  ];
-
-  const timeSlotsList = [
-    'Bất kỳ lúc nào',
-    'Buổi sáng (06:00 - 11:00)',
-    'Buổi chiều (13:00 - 17:00)',
-    'Khung giờ vàng (17:00 - 22:00)',
-    'Đêm muộn (21:00 - 23:30)',
-  ];
 
   const handleSearch = () => {
     onSearchSubmit({
       city: selectedCity,
       district: selectedDistrict,
-      date: selectedDate,
-      time: selectedTime,
+      date: '',
+      time: '',
     });
   };
 
@@ -110,18 +89,16 @@ export const Hero: React.FC<HeroProps> = ({
         {/* Floating Quick Tìm kiếm Bar Container */}
         <div
           id="hero-quick-search-card"
-          className="mt-12 sm:mt-16 w-full max-w-4xl bg-white/95 backdrop-blur-lg rounded-2xl sm:rounded-[32px] shadow-[0_8px_40px_rgba(0,0,0,0.15)] border border-white/40 p-3 sm:p-4 relative text-left"
+          className="mt-12 sm:mt-16 w-full max-w-2xl bg-white/95 backdrop-blur-lg rounded-2xl sm:rounded-[32px] shadow-[0_8px_40px_rgba(0,0,0,0.15)] border border-white/40 p-3 sm:p-4 relative text-left"
         >
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-3 items-center">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
             {/* Field 1: Location / District */}
-            <div className="relative md:col-span-4 p-2 sm:p-3 rounded-lg hover:bg-primary/5/60 transition-colors">
+            <div className="relative flex-1 p-2 sm:p-3 rounded-lg hover:bg-primary/5/60 transition-colors w-full">
               <button
                 type="button"
                 id="search-field-location"
                 onClick={() => {
                   setOpenDistrictDropdown(!openDistrictDropdown);
-                  setOpenDateDropdown(false);
-                  setOpenTimeDropdown(false);
                 }}
                 className="w-full flex items-start gap-3 text-left cursor-pointer focus:outline-hidden"
               >
@@ -170,124 +147,8 @@ export const Hero: React.FC<HeroProps> = ({
               )}
             </div>
 
-            {/* Divider for Desktop */}
-            <div className="hidden md:block w-px h-10 bg-slate-200" />
-
-            {/* Field 2: Date */}
-            <div className="relative md:col-span-3 p-2 sm:p-3 rounded-lg hover:bg-primary/5/60 transition-colors">
-              <button
-                type="button"
-                id="search-field-date"
-                onClick={() => {
-                  setOpenDateDropdown(!openDateDropdown);
-                  setOpenDistrictDropdown(false);
-                  setOpenTimeDropdown(false);
-                }}
-                className="w-full flex items-start gap-3 text-left cursor-pointer focus:outline-hidden"
-              >
-                <Calendar className="w-5 h-5 text-ink/50 mt-1 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <span className="block text-[11px] font-bold uppercase tracking-wider text-ink/50">
-                    NGÀY
-                  </span>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-ink truncate">
-                      {selectedDate === '' ? 'Bạn dự định chơi khi nào?' : selectedDate}
-                    </span>
-                    <ChevronDown className="w-4 h-4 text-ink/50 shrink-0 ml-1" />
-                  </div>
-                </div>
-              </button>
-
-              {/* Date Dropdown Menu */}
-              {openDateDropdown && (
-                <div
-                  id="date-dropdown-popover"
-                  className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-ink/10 py-2 z-50 animate-in fade-in zoom-in-95"
-                >
-                  <p className="px-3 py-1.5 text-xs font-bold text-ink/50 uppercase tracking-wider">
-                    Chọn Ngày Đặt
-                  </p>
-                  {datesList.map((dt) => (
-                    <button
-                      key={dt}
-                      type="button"
-                      onClick={() => {
-                        setSelectedDate(dt);
-                        setOpenDateDropdown(false);
-                      }}
-                      className={`w-full text-left px-3.5 py-2 text-xs sm:text-sm font-medium hover:bg-primary/10 transition-colors cursor-pointer flex items-center justify-between ${
-                        selectedDate === dt ? 'text-primary font-bold bg-primary/5' : 'text-ink'
-                      }`}
-                    >
-                      <span>{dt}</span>
-                      {selectedDate === dt && <span className="text-primary text-xs">✓</span>}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Divider for Desktop */}
-            <div className="hidden md:block w-px h-10 bg-slate-200" />
-
-            {/* Field 3: Time */}
-            <div className="relative md:col-span-3 p-2 sm:p-3 rounded-lg hover:bg-primary/5/60 transition-colors">
-              <button
-                type="button"
-                id="search-field-time"
-                onClick={() => {
-                  setOpenTimeDropdown(!openTimeDropdown);
-                  setOpenDistrictDropdown(false);
-                  setOpenDateDropdown(false);
-                }}
-                className="w-full flex items-start gap-3 text-left cursor-pointer focus:outline-hidden"
-              >
-                <Clock className="w-5 h-5 text-ink/50 mt-1 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <span className="block text-[11px] font-bold uppercase tracking-wider text-ink/50">
-                    GIỜ
-                  </span>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-ink truncate">
-                      {selectedTime === '' ? 'Chọn khung giờ' : selectedTime}
-                    </span>
-                    <ChevronDown className="w-4 h-4 text-ink/50 shrink-0 ml-1" />
-                  </div>
-                </div>
-              </button>
-
-              {/* Time Dropdown Menu */}
-              {openTimeDropdown && (
-                <div
-                  id="time-dropdown-popover"
-                  className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-ink/10 py-2 z-50 animate-in fade-in zoom-in-95"
-                >
-                  <p className="px-3 py-1.5 text-xs font-bold text-ink/50 uppercase tracking-wider">
-                    Preferred Session
-                  </p>
-                  {timeSlotsList.map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => {
-                        setSelectedTime(t);
-                        setOpenTimeDropdown(false);
-                      }}
-                      className={`w-full text-left px-3.5 py-2 text-xs sm:text-sm font-medium hover:bg-primary/10 transition-colors cursor-pointer flex items-center justify-between ${
-                        selectedTime === t ? 'text-primary font-bold bg-primary/5' : 'text-ink'
-                      }`}
-                    >
-                      <span>{t}</span>
-                      {selectedTime === t && <span className="text-primary text-xs">✓</span>}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Field 4: Tìm kiếm Button */}
-            <div className="md:col-span-2 flex justify-center md:justify-end mt-4 md:mt-0">
+            <div className="flex-shrink-0 w-full md:w-auto mt-4 md:mt-0">
               <button
                 type="button"
                 id="hero-search-submit-btn"
@@ -305,5 +166,6 @@ export const Hero: React.FC<HeroProps> = ({
     </section>
   );
 };
+
 
 

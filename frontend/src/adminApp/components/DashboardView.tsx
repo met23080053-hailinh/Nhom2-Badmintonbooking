@@ -18,7 +18,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [stats, setStats] = useState<any>(null);
 
   React.useEffect(() => {
-    fetch(`https://cau-long.rf.gd/backend/admin_dashboard_stats.php`)
+    fetch(`/backend/admin_dashboard_stats.php`)
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success') {
@@ -492,5 +492,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     </div>
   );
 };
+
 
 

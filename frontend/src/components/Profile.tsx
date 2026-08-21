@@ -30,7 +30,7 @@ export const Profile: React.FC<ProfileProps> = ({ userId, userName, userPhone, u
     setIsSubmitting(true);
     setInfoMessage(null);
     try {
-      const res = await fetch(`https://cau-long.rf.gd/backend/update_profile.php`, {
+      const res = await fetch(`/backend/update_profile.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -63,7 +63,7 @@ export const Profile: React.FC<ProfileProps> = ({ userId, userName, userPhone, u
     setIsSubmitting(true);
     setPassMessage(null);
     try {
-      const res = await fetch(`https://cau-long.rf.gd/backend/change_password.php`, {
+      const res = await fetch(`/backend/change_password.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -262,5 +262,6 @@ export const Profile: React.FC<ProfileProps> = ({ userId, userName, userPhone, u
     </div>
   );
 };
+
 
 

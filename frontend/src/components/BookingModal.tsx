@@ -46,7 +46,31 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [selectedSubSân, setSelectedSubSân] = useState<any>(
     generatedSubSâns[0]
   );
-  const [bookingNgày, setBookingNgày] = useState<string>(defaultNgày || 'Hôm nay, 24 Th10');
+  // Available dates (dynamic next 5 days)
+  const availableNgàys = React.useMemo(() => {
+    return Array.from({ length: 5 }).map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      
+      let label = '';
+      if (i === 0) label = 'Hôm nay';
+      else if (i === 1) label = 'Ngày mai';
+      else {
+        const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+        label = days[d.getDay()];
+      }
+      
+      return {
+        label,
+        sub: `${day}/${month}`,
+        value: `${label}, ${day}/${month}`
+      };
+    });
+  }, []);
+
+  const [bookingNgày, setBookingNgày] = useState<string>(defaultNgày || availableNgàys[0].value);
   const [selectedSlotIds, setSelectedSlotIds] = useState<string[]>([]);
   const [addons, setAddons] = useState<EquipmentAddon[]>(
     EQUIPMENT_OPTIONS.map((item) => ({ ...item, quantity: 0 }))
@@ -62,14 +86,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutData, setCheckoutData] = useState<any>(null);
 
-  // Available dates
-  const availableNgàys = [
-    { label: 'Hôm nay', sub: '24 Th10', value: 'Hôm nay, 24 Th10' },
-    { label: 'Ngày mai', sub: '25 Th10', value: 'Ngày mai, 25 Th10' },
-    { label: 'Thứ Bảy', sub: '26 Th10', value: 'Thứ Bảy, 26 Th10' },
-    { label: 'Chủ Nhật', sub: '27 Th10', value: 'Chủ Nhật, 27 Th10' },
-    { label: 'Thứ Hai', sub: '28 Th10', value: 'Thứ Hai, 28 Th10' },
-  ];
+  // availableNgàys logic moved above
 
   // Toggle slot selection
   const handleToggleSlot = (slotId: string, isAvailable: boolean) => {
@@ -143,7 +160,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     const startTimeStr = timeParts[0] + ':00';
     const endTimeStr = timeParts[1] + ':00'; // Simply using the first slot for simplicity of API demo
 
-    fetch(`https://cau-long.rf.gd/backend/create_booking.php`, {
+    fetch(`/backend/create_booking.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -750,5 +767,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     </>
   );
 };
+
 
 

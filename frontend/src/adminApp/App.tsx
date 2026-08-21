@@ -45,7 +45,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
 
   React.useEffect(() => {
-    fetch(`https://cau-long.rf.gd/backend/get_bookings.php`)
+    fetch(`/backend/get_bookings.php`)
       .then(res => res.json())
       .then(data => {
         if(data.status === 'success') {
@@ -76,7 +76,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
 
   // Fetch Users
   React.useEffect(() => {
-    fetch(`https://cau-long.rf.gd/backend/admin_get_users.php`)
+    fetch(`/backend/admin_get_users.php`)
       .then(res => res.json())
       .then(data => {
         if(data.status === 'success') {
@@ -88,7 +88,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
 
   // Fetch News
   React.useEffect(() => {
-    fetch(`https://cau-long.rf.gd/backend/get_news.php`)
+    fetch(`/backend/get_news.php`)
       .then(res => res.json())
       .then(data => {
         if(data.status === 'success') {
@@ -208,7 +208,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
 
   // User Handlers
   const handleUpdateUserStatus = (userId: string, status: UserStatus) => {
-    fetch(`https://cau-long.rf.gd/backend/admin_manage_users.php`, {
+    fetch(`/backend/admin_manage_users.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update_status', id: userId, status })
@@ -220,7 +220,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
   };
 
   const handleAddUser = (user: UserAccount) => {
-    fetch(`https://cau-long.rf.gd/backend/admin_manage_users.php`, {
+    fetch(`/backend/admin_manage_users.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'add', name: user.name, phone: user.phone, email: user.email, role: user.role })
@@ -247,7 +247,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
 
   // News Handlers
   const handleAddNews = (article: NewsArticle) => {
-    fetch(`https://cau-long.rf.gd/backend/admin_manage_news.php`, {
+    fetch(`/backend/admin_manage_news.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -274,7 +274,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
   };
 
   const handleDeleteNews = (articleId: string) => {
-    fetch(`https://cau-long.rf.gd/backend/admin_manage_news.php`, {
+    fetch(`/backend/admin_manage_news.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'delete', id: articleId })
@@ -445,5 +445,6 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
     </div>
   );
 }
+
 
 

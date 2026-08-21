@@ -380,7 +380,7 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
                               <span className={`text-[10px] font-bold uppercase mt-0.5 inline-block ${
                                 isCancelled ? 'text-earth-danger' :
                                 isPending ? 'text-earth-accent' :
-                                'bg-earth-primary text-ink px-1.5 py-0.5 rounded'
+                                'bg-earth-primary text-amber-400 px-1.5 py-0.5 rounded'
                               }`}>
                                 {isCancelled ? 'Đã hủy' : isPending ? 'Chờ xử lý' : 'Đã xác nhận'}
                               </span>
@@ -434,7 +434,7 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
                 </span>
               )}
               {activeBooking?.status === 'Paid' && (
-                <span className="bg-earth-primary text-ink px-3 py-1 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-md">
+                <span className="bg-earth-primary text-amber-400 px-3 py-1 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-md">
                   ĐÃ XÁC NHẬN
                 </span>
               )}
@@ -781,5 +781,6 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
     </div>
   );
 };
+
 
 

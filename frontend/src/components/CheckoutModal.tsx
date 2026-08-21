@@ -38,7 +38,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleConfirmPayment = () => {
     setIsProcessing(true);
-    fetch(`https://cau-long.rf.gd/backend/process_payment.php`, {
+    fetch(`/backend/process_payment.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ booking_id: bookingId })
@@ -159,5 +159,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     </div>
   );
 };
+
 
 

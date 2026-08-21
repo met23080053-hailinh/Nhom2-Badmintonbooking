@@ -62,7 +62,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       : { email: email, password: password };
 
     try {
-      const response = await fetch(`https://cau-long.rf.gd/backend/${endpoint}`, {
+      const response = await fetch(`/backend/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -92,7 +92,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
     setError('');
     try {
-      const response = await fetch(`https://cau-long.rf.gd/backend/google_login.php`, {
+      const response = await fetch('/backend/google_login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential })
@@ -116,7 +116,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch(`https://cau-long.rf.gd/backend/facebook_login.php`, {
+      const res = await fetch('/backend/facebook_login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accessToken: response.accessToken })
@@ -141,7 +141,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setError('Facebook SDK chưa được tải, vui lòng thử lại sau.');
       return;
     }
-    
+
     (window as any).FB.login((response: any) => {
       if (response.authResponse) {
         handleFacebookSuccess(response.authResponse);
@@ -149,13 +149,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         console.error('FB Login Failed or Cancelled', response);
         setError('Đăng nhập Facebook thất bại hoặc đã bị hủy.');
       }
-    }, {scope: 'public_profile,email'});
+    }, { scope: 'public_profile,email' });
   };
 
   return (
     <div
       id="auth-modal-overlay"
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
     >
       <div
         id="auth-modal-content"
@@ -169,8 +169,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <X className="w-4 h-4" />
           </button>
           <h2 className="text-xl font-bold mt-2">
-            {mode === 'login' 
-              ? (intent === 'admin' ? 'Đăng Nhập Chủ Sân' : 'Đăng Nhập') 
+            {mode === 'login'
+              ? (intent === 'admin' ? 'Đăng Nhập Chủ Sân' : 'Đăng Nhập')
               : 'Đăng Ký Tài Khoản'}
           </h2>
         </div>
@@ -196,7 +196,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && <p className="text-red-500 text-xs text-center">{error}</p>}
-          
+
           {mode === 'register' && (
             <div className="flex flex-col items-center mb-6 text-center">
               <div className="w-12 h-12 bg-[#e6f7ed] text-[#0eb552] rounded-xl flex items-center justify-center mb-3">
@@ -204,7 +204,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
               <h3 className="text-xl font-bold text-earth-main mb-1">Đăng ký</h3>
               <p className="text-sm text-earth-main/70 mb-3">Tạo tài khoản để đặt sân dễ dàng hơn</p>
-              
+
               <div className="flex flex-wrap justify-center gap-2 mb-2">
                 <span className="inline-flex items-center gap-1 bg-[#f0fdf4] text-[#0eb552] text-xs font-semibold px-2 py-1 rounded-full"><span className="material-symbols-outlined text-[14px]">check</span> Đặt sân nhanh</span>
                 <span className="inline-flex items-center gap-1 bg-[#f0fdf4] text-[#0eb552] text-xs font-semibold px-2 py-1 rounded-full"><span className="material-symbols-outlined text-[14px]">check</span> Xem lịch sử</span>
@@ -228,7 +228,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   />
                 </div>
               </div>
-              
+
               <div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-earth-main/40 text-lg">call</span>
@@ -258,7 +258,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               />
             </div>
           </div>
-          
+
           <div>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-earth-main/40 text-lg">lock</span>
@@ -304,10 +304,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <span className="flex-shrink-0 mx-4 text-xs font-semibold text-earth-muted/60 uppercase">Hoặc</span>
                   <div className="flex-grow border-t border-earth"></div>
                 </div>
-                
+
                 <div className="flex flex-col gap-3 justify-center w-full">
                   <div className="flex justify-center">
-                    <GoogleLogin 
+                    <GoogleLogin
                       onSuccess={handleGoogleSuccess}
                       onError={() => setError('Đăng nhập Google thất bại.')}
                       useOneTap
@@ -321,7 +321,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     >
                       <div className="flex items-center gap-2">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                         </svg>
                         <span>Tiếp tục với Facebook</span>
                       </div>
@@ -336,5 +336,3 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     </div>
   );
 }
-
-

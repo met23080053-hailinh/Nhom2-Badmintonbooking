@@ -205,16 +205,12 @@ export const CourtDetailView: React.FC<CourtDetailViewProps> = ({ court, onBookN
               
               <div className="space-y-4 mb-6">
                 <div className="flex items-center justify-between border-b border-ink/10 pb-3">
-                  <span className="text-sm text-ink/70">Ngày đặt</span>
-                  <span className="text-sm font-bold text-ink cursor-pointer hover:text-primary">Chọn ngày</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-ink/10 pb-3">
-                  <span className="text-sm text-ink/70">Giờ đặt</span>
-                  <span className="text-sm font-bold text-ink cursor-pointer hover:text-primary">Chọn giờ</span>
+                  <span className="text-sm text-ink/70">Giá thuê (từ)</span>
+                  <span className="text-sm font-bold text-ink">{(court.pricePerHour).toLocaleString('vi-VN')} VNĐ/h</span>
                 </div>
                 <div className="flex items-center justify-between pb-2">
-                  <span className="text-sm text-ink/70">Thời lượng</span>
-                  <span className="text-sm font-bold text-ink">1 giờ</span>
+                  <span className="text-sm text-ink/70">Tùy chọn</span>
+                  <span className="text-sm font-bold text-ink">Chọn ngày & giờ</span>
                 </div>
               </div>
 
@@ -263,5 +259,6 @@ export const CourtDetailView: React.FC<CourtDetailViewProps> = ({ court, onBookN
     </div>
   );
 };
+
 
 

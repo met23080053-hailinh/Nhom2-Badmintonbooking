@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, MapPin, Star, Filter, SlidersHorizontal, Check, Wind, Shield, Coffee, Wifi, Phone } from 'lucide-react';
 import { CourtFacility } from '../types';
-import { VIETNAM_LOCATIONS, AVAILABLE_AMENITIES } from '../data/courts';
+import { VIETNAM_LOCATIONS } from '../data/courts';
 
 interface CourtListViewProps {
   courts: CourtFacility[];
@@ -23,18 +23,9 @@ export const CourtListView: React.FC<CourtListViewProps> = ({
   const [selectedDistrict, setSelectedDistrict] = useState(initialDistrict);
   const [selectedSurface, setSelectedSurface] = useState<string>('Tất cả mặt sân');
   const [sortBy, setSortBy] = useState<'recommended' | 'price-asc' | 'price-desc' | 'rating'>('recommended');
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [maxGiá, setMaxGiá] = useState<number>(200000);
 
   const surfaceOptions = ['Tất cả mặt sân', 'Thảm Taraflex BWF', 'Sàn Gỗ', 'Sàn PVC'];
-
-  const toggleAmenity = (amenity: string) => {
-    if (selectedAmenities.includes(amenity)) {
-      setSelectedAmenities(selectedAmenities.filter((a) => a !== amenity));
-    } else {
-      setSelectedAmenities([...selectedAmenities, amenity]);
-    }
-  };
 
   const filteredCourts = useMemo(() => {
     return courts
@@ -53,18 +44,14 @@ export const CourtListView: React.FC<CourtListViewProps> = ({
           if (!matchesName && !matchesLoc && !matchesDesc) return false;
         }
         // Max price
-        if (court.pricePerHour > maxGiá) {
+        const effectiveMax = maxGiá < 1000 && maxGiá > 0 ? maxGiá * 1000 : maxGiá;
+        if (court.pricePerHour > effectiveMax) {
           return false;
         }
         // Surface filter
         if (selectedSurface !== 'Tất cả mặt sân') {
           const hasSurface = court.subCourts.some((sc) => sc.surface === selectedSurface);
           if (!hasSurface) return false;
-        }
-        // Tiện ích
-        if (selectedAmenities.length > 0) {
-          const hasAllAmenities = selectedAmenities.every((a) => court.amenities.includes(a));
-          if (!hasAllAmenities) return false;
         }
         return true;
       })
@@ -74,7 +61,7 @@ export const CourtListView: React.FC<CourtListViewProps> = ({
         if (sortBy === 'rating') return b.rating - a.rating;
         return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
       });
-  }, [courts, selectedCity, selectedDistrict, searchQuery, maxGiá, selectedSurface, selectedAmenities, sortBy]);
+  }, [courts, selectedCity, selectedDistrict, searchQuery, maxGiá, selectedSurface, sortBy]);
 
   return (
     <div id="court-list-page" className="py-8 sm:py-12 bg-white">
@@ -179,14 +166,12 @@ export const CourtListView: React.FC<CourtListViewProps> = ({
                 </span>
                 {(selectedDistrict !== 'Tất cả các Quận' ||
                   selectedSurface !== 'Tất cả mặt sân' ||
-                  selectedAmenities.length > 0 ||
                   maxGiá < 200000) && (
                   <button
                     type="button"
                     onClick={() => {
                       setSelectedDistrict('Tất cả các Quận');
                       setSelectedSurface('Tất cả mặt sân');
-                      setSelectedAmenities([]);
                       setMaxGiá(200000);
                       setSearchQuery('');
                     }}
@@ -228,42 +213,20 @@ export const CourtListView: React.FC<CourtListViewProps> = ({
                     Giá tối đa / Giờ
                   </label>
                   <span className="text-xs font-bold text-primary">
-                    {new Intl.NumberFormat('vi-VN').format(maxGiá)} VND
+                    {new Intl.NumberFormat('vi-VN').format(maxGiá < 1000 && maxGiá > 0 ? maxGiá * 1000 : maxGiá)} VND
                   </span>
                 </div>
                 <input
-                  type="range"
-                  min="60000"
-                  max="200000"
-                  step="10000"
-                  value={maxGiá}
-                  onChange={(e) => setMaxGiá(Number(e.target.value))}
-                  className="w-full accent-primary cursor-pointer"
+                  type="number"
+                  min="0"
+                  value={maxGiá || ''}
+                  onChange={(e) => setMaxGiá(Number(e.target.value) || 0)}
+                  placeholder="Ví dụ: 50"
+                  className="w-full px-3 py-2 mt-1 bg-white border border-ink/20 rounded-xl text-sm text-ink font-bold focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 />
+                <p className="text-[11px] text-ink/50 mt-1.5 italic">Mẹo: Nhập "50" hệ thống sẽ tự hiểu là 50.000 VND</p>
               </div>
 
-              {/* Tiện ích */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-ink/60 mb-2">
-                  Tiện ích
-                </label>
-                <div className="space-y-2">
-                  {AVAILABLE_AMENITIES.slice(0, 5).map((amenity) => (
-                    <label
-                      key={amenity}
-                      className="flex items-center gap-2 text-xs text-ink/80 cursor-pointer hover:text-primary"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedAmenities.includes(amenity)}
-                        onChange={() => toggleAmenity(amenity)}
-                        className="rounded-sm text-primary focus:ring-primary"
-                      />
-                      <span>{amenity}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
             </div>
           </aside>
 
@@ -289,7 +252,6 @@ export const CourtListView: React.FC<CourtListViewProps> = ({
                   onClick={() => {
                     setSelectedDistrict('Tất cả các Quận');
                     setSelectedSurface('Tất cả mặt sân');
-                    setSelectedAmenities([]);
                     setMaxGiá(200000);
                     setSearchQuery('');
                   }}
@@ -396,5 +358,6 @@ export const CourtListView: React.FC<CourtListViewProps> = ({
     </div>
   );
 };
+
 
 

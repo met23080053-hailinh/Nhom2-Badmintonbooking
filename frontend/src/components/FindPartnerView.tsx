@@ -36,7 +36,7 @@ export const FindPartnerView: React.FC<FindPartnerViewProps> = ({ courts, onBook
   const skillOptions = ['Mọi Trình Độ', 'Người mới chơi (Trung bình yếu) (1.5 - 2.5)', 'Trung bình (3.0 - 4.0)', 'Khá - Giỏi (Nâng cao) (4.5+)'];
 
   React.useEffect(() => {
-    fetch(`https://cau-long.rf.gd/backend/get_partner_requests.php`)
+    fetch(`/backend/get_partner_requests.php`)
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success') {
@@ -89,7 +89,7 @@ export const FindPartnerView: React.FC<FindPartnerViewProps> = ({ courts, onBook
 
     if (dbId) {
       // API call to join real match
-      fetch(`https://cau-long.rf.gd/backend/join_matchmaking.php`, {
+      fetch(`/backend/join_matchmaking.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -140,7 +140,7 @@ export const FindPartnerView: React.FC<FindPartnerViewProps> = ({ courts, onBook
     const startTimeStr = timeParts[0] ? `${timeParts[0]}:00` : '18:00:00';
     const endTimeStr = timeParts[1] ? `${timeParts[1]}:00` : '20:00:00';
 
-    fetch(`https://cau-long.rf.gd/backend/create_partner_request.php`, {
+    fetch(`/backend/create_partner_request.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -653,5 +653,6 @@ export const FindPartnerView: React.FC<FindPartnerViewProps> = ({ courts, onBook
     </div>
   );
 };
+
 
 
