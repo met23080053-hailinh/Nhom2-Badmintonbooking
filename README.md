@@ -3,7 +3,7 @@
 
 ---
 
-## ⚠️ HƯỚNG DẪN CÀI ĐẶT NHANH DÀNH CHO GIẢNG VIÊN (QUAN TRỌNG) ⚠️
+## ⚠️ HƯỚNG DẪN CÀI ĐẶT  ⚠️
 Để hệ thống hoạt động chính xác (đặc biệt là tính năng kết nối API), xin thầy vui lòng thực hiện đúng theo các bước dưới đây:
 
 ### 1. Chuẩn bị Môi trường
@@ -52,11 +52,9 @@ Hệ thống đã tự động tạo sẵn 2 tài khoản với 2 phân quyền 
 
 ---
 
-## 🌟 TÍNH NĂNG NỔI BẬT (CHẤM ĐIỂM)
+## 🌟 TÍNH NĂNG NỔI BẬT 
 1. **Thuật toán Phân trang Động (Dynamic Pagination):** Hiển thị danh sách sân với thuật toán cắt (slice) array và tự động tính tổng số trang.
 2. **Quy trình Thanh toán Mô phỏng (VietQR):** Giao diện quét mã QR động.
 3. **Mã hoá Mật khẩu An toàn (BCrypt):** Toàn bộ mật khẩu trong Database đều được băm bằng thuật toán `password_hash()` của PHP (tốt hơn MD5/SHA256).
 4. **Hệ thống lọc thông minh:** Tìm kiếm sân theo Tên, Phân loại (Sân Đơn/Đôi/VIP) và Trạng thái (Hoạt động/Bảo trì).
 5. **Giao diện Responsive:** Giao diện co giãn tự động tương thích mọi thiết bị di động với TailwindCSS và Lucide Icons.
-
-*Trân trọng cảm ơn thầy đã dành thời gian kiểm tra và đánh giá dự án của nhóm!*
