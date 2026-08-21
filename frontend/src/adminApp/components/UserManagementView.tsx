@@ -58,7 +58,7 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({
   const [nTitle, setNTitle] = useState('');
   const [nSummary, setNSummary] = useState('');
   const [nContent, setNContent] = useState('');
-  const [nImage, setNImage] = useState('https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&auto=format&fit=crop&q=80');
+  const [nImage, setNImage] = useState('/images/preview.webp');
 
   // Filtered Users
   const filteredUsers = users.filter((u) => {

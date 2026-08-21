@@ -39,11 +39,19 @@ export const CourtManagementView: React.FC<CourtManagementViewProps> = ({
     return matchesSearch && matchesType && matchesStatus;
   });
 
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, typeFilter, statusFilter, courts.length]);
+
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.ceil(filteredCourts.length / ITEMS_PER_PAGE) || 1;
+  const paginatedCourts = filteredCourts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   const openAddModal = () => {
     setEditingCourt(null);
     setFormName(''); setFormType('Sân đôi'); setFormArea('Khu A');
     setFormPrice('120000'); setFormStatus('HOẠT ĐỘNG');
-    setFormImage('https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80');
+    setFormImage('/images/preview (1).webp');
     setFormDesc(''); setIsModalOpen(true);
   };
 
@@ -62,7 +70,7 @@ export const CourtManagementView: React.FC<CourtManagementViewProps> = ({
       onUpdateCourt({ ...editingCourt, name: formName, type: formType, area: formArea, pricePerHour: priceNum, status: formStatus, image: formImage || editingCourt.image, description: formDesc });
       onShowToast('Cập nhật thành công', `Đã cập nhật thông tin sân ${formName}`, 'success');
     } else {
-      onAddCourt({ id: `court-${Date.now()}`, name: formName, type: formType, area: formArea, pricePerHour: priceNum, status: formStatus, image: formImage || 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80', description: formDesc });
+      onAddCourt({ id: `court-${Date.now()}`, name: formName, type: formType, area: formArea, pricePerHour: priceNum, status: formStatus, image: formImage || '/images/preview (1).webp', description: formDesc });
       onShowToast('Thêm sân thành công', `Đã thêm ${formName} vào hệ thống`, 'success');
     }
     setIsModalOpen(false);
@@ -141,13 +149,13 @@ export const CourtManagementView: React.FC<CourtManagementViewProps> = ({
               </tr>
             </thead>
             <tbody style={{ color: 'var(--admin-text-main)', fontSize: 13 }}>
-              {filteredCourts.length === 0 ? (
+              {paginatedCourts.length === 0 ? (
                 <tr><td colSpan={7} className="py-12 text-center text-earth-muted">
                   <span className="material-symbols-outlined text-4xl block mb-2 opacity-50">sports_tennis</span>
                   Không tìm thấy sân phù hợp với bộ lọc.
                 </td></tr>
               ) : (
-                filteredCourts.map((court) => (
+                paginatedCourts.map((court) => (
                   <tr key={court.id} className="group transition-colors hover:bg-slate-50"
                     style={{ borderBottom: '1px solid var(--admin-border)' }}>
 
@@ -219,17 +227,16 @@ export const CourtManagementView: React.FC<CourtManagementViewProps> = ({
         {/* Pagination */}
         <div className="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50 border-t border-earth">
           <p className="text-xs font-medium text-earth-muted">
-            Hiển thị 1–{filteredCourts.length} trên {courts.length} sân
+            Hiển thị {filteredCourts.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredCourts.length)} trên {filteredCourts.length} sân
           </p>
           <div className="flex items-center gap-1.5">
             <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1}
               className="w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer disabled:opacity-30 bg-white border border-earth text-earth-muted hover:bg-slate-50">
               <span className="material-symbols-outlined text-lg">chevron_left</span>
             </button>
-            {[1, 2, 3].map(pageBtn)}
-            <span className="text-xs px-1 text-earth-muted">...</span>
-            <button onClick={() => setCurrentPage(currentPage + 1)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer bg-white border border-earth text-earth-muted hover:bg-slate-50">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageBtn)}
+            <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}
+              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer disabled:opacity-30 bg-white border border-earth text-earth-muted hover:bg-slate-50">
               <span className="material-symbols-outlined text-lg">chevron_right</span>
             </button>
           </div>
@@ -293,7 +300,7 @@ export const CourtManagementView: React.FC<CourtManagementViewProps> = ({
               <div>
                 <label style={LABEL_STYLE}>URL Hình ảnh sân</label>
                 <input type="url" value={formImage} onChange={(e) => setFormImage(e.target.value)}
-                  placeholder="https://images.unsplash.com/..." style={INPUT_STYLE} />
+                  placeholder="/images/..." style={INPUT_STYLE} />
               </div>
               <div>
                 <label style={LABEL_STYLE}>Mô tả tiện ích sân</label>

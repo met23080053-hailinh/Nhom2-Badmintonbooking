@@ -46,7 +46,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
             id: 'court-' + c.id,
             name: c.name,
             location: c.location,
-            type: c.court_type === 'VIP' ? 'vip' : 'standard',
+            type: c.court_type || 'Sân đôi',
             pricePerHour: c.pricePerHour,
             status: c.status === 'AVAILABLE' ? 'active' : 'maintenance'
           }));
@@ -180,12 +180,12 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: court.name,
-        location: court.location,
+        location: court.area || 'Khác',
         city: 'Hà Nội',
         district: 'Khác',
-        court_type: court.type === 'vip' ? 'VIP' : 'STANDARD',
+        court_type: court.type,
         price_per_hour: court.pricePerHour,
-        status: court.status === 'active' ? 'AVAILABLE' : 'MAINTENANCE',
+        status: court.status === 'HOẠT ĐỘNG' ? 'AVAILABLE' : 'MAINTENANCE',
         featured: 0
       })
     })
@@ -208,10 +208,10 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
       body: JSON.stringify({
         court_id: String(court.id).replace('court-', ''),
         name: court.name,
-        location: court.location,
-        court_type: court.type === 'vip' ? 'VIP' : 'STANDARD',
+        location: court.area || 'Khác',
+        court_type: court.type,
         price_per_hour: court.pricePerHour,
-        status: court.status === 'active' ? 'AVAILABLE' : 'MAINTENANCE'
+        status: court.status === 'HOẠT ĐỘNG' ? 'AVAILABLE' : 'MAINTENANCE'
       })
     })
       .then(res => res.json())

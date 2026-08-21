@@ -418,7 +418,7 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
             className="h-36 w-full bg-cover bg-center relative"
             style={{
               backgroundImage:
-                "url('https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80')",
+                "url('/images/preview (3).webp')",
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent"></div>

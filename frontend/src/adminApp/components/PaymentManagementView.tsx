@@ -460,7 +460,7 @@ export const PaymentManagementView: React.FC<PaymentManagementViewProps> = ({
                   className="w-full aspect-[3/4] max-h-72 bg-slate-100 rounded-xl border border-earth overflow-hidden relative group cursor-zoom-in shadow-inner"
                 >
                   <img
-                    src={selectedTxn.proofImage || 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80'}
+                    src={selectedTxn.proofImage || '/images/preview (2).webp'}
                     alt="Proof of Payment Receipt"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -555,7 +555,7 @@ export const PaymentManagementView: React.FC<PaymentManagementViewProps> = ({
         >
           <div className="relative max-w-lg w-full max-h-[90vh]">
             <img
-              src={selectedTxn.proofImage || 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&auto=format&fit=crop&q=80'}
+              src={selectedTxn.proofImage || '/images/preview (2).webp'}
               alt="Zoomed Receipt"
               className="w-full h-auto rounded-xl shadow-2xl border border-slate-300"
             />
