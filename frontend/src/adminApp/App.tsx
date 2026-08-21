@@ -19,14 +19,7 @@ import {
   PaymentStatus,
   UserStatus
 } from './types';
-import {
-  initialCourts,
-  initialBookings,
-  initialPayments,
-  initialUsers,
-  initialPromotions,
-  initialNews
-} from './data/mockData';
+
 
 interface Toast {
   id: string;
@@ -41,10 +34,29 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Application Data States
-  const [courts, setCourts] = useState<Court[]>(initialCourts);
-  const [bookings, setBookings] = useState<Booking[]>(initialBookings);
+  const [courts, setCourts] = useState<Court[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
 
-  const [payments, setPayments] = useState<PaymentTransaction[]>(initialPayments);
+  React.useEffect(() => {
+    fetch(`/backend/get_courts.php`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          const apiCourts = data.data.map((c: any) => ({
+            id: 'court-' + c.id,
+            name: c.name,
+            location: c.location,
+            type: c.court_type === 'VIP' ? 'vip' : 'standard',
+            pricePerHour: c.pricePerHour,
+            status: c.status === 'AVAILABLE' ? 'active' : 'maintenance'
+          }));
+          setCourts(apiCourts);
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
+
+  const [payments, setPayments] = useState<PaymentTransaction[]>([]);
 
   React.useEffect(() => {
     fetch(`/backend/get_bookings.php`)
@@ -87,8 +99,20 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
   }, []);
 
   const [users, setUsers] = useState<UserAccount[]>([]);
-  const [promotions, setPromotions] = useState<Promotion[]>(initialPromotions);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [news, setNews] = useState<NewsArticle[]>([]);
+
+  // Fetch Promotions
+  React.useEffect(() => {
+    fetch(`/backend/get_promotions.php`)
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'success') {
+          setPromotions(data.data);
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
 
   // Fetch Users
   React.useEffect(() => {
@@ -151,15 +175,71 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
 
   // Court Handlers
   const handleAddCourt = (court: Court) => {
-    setCourts((prev) => [court, ...prev]);
+    fetch('/backend/create_court.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: court.name,
+        location: court.location,
+        city: 'Hà Nội',
+        district: 'Khác',
+        court_type: court.type === 'vip' ? 'VIP' : 'STANDARD',
+        price_per_hour: court.pricePerHour,
+        status: court.status === 'active' ? 'AVAILABLE' : 'MAINTENANCE',
+        featured: 0
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          setCourts((prev) => [{...court, id: 'court-' + data.court_id}, ...prev]);
+          showToast('Thành công', 'Đã thêm sân mới', 'success');
+        } else {
+          showToast('Lỗi', data.message, 'error');
+        }
+      })
+      .catch(err => console.error(err));
   };
 
   const handleUpdateCourt = (court: Court) => {
-    setCourts((prev) => prev.map((c) => (c.id === court.id ? court : c)));
+    fetch('/backend/update_court.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        court_id: court.id.replace('court-', ''),
+        name: court.name,
+        location: court.location,
+        court_type: court.type === 'vip' ? 'VIP' : 'STANDARD',
+        price_per_hour: court.pricePerHour,
+        status: court.status === 'active' ? 'AVAILABLE' : 'MAINTENANCE'
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          setCourts((prev) => prev.map((c) => (c.id === court.id ? court : c)));
+          showToast('Thành công', 'Đã cập nhật sân', 'success');
+        } else {
+          showToast('Lỗi', data.message, 'error');
+        }
+      })
+      .catch(err => console.error(err));
   };
 
   const handleDeleteCourt = (courtId: string) => {
-    setCourts((prev) => prev.filter((c) => c.id !== courtId));
+    fetch(`/backend/delete_court.php?id=${courtId.replace('court-', '')}`, {
+      method: 'POST'
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          setCourts((prev) => prev.filter((c) => c.id !== courtId));
+          showToast('Thành công', 'Đã xóa sân', 'success');
+        } else {
+          showToast('Lỗi', data.message, 'error');
+        }
+      })
+      .catch(err => console.error(err));
   };
 
   // Booking Handlers
@@ -264,18 +344,48 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
 
   // Promotion Handlers
   const handleAddPromotion = (promo: Promotion) => {
-    setPromotions((prev) => [promo, ...prev]);
+    fetch('/backend/admin_manage_promotions.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'add',
+        code: promo.code,
+        discountType: promo.discountType,
+        discountValue: promo.discountValue,
+        description: promo.description,
+        maxLimit: promo.maxLimit
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          setPromotions((prev) => [{ ...promo, id: data.id, status: 'ĐANG CHẠY' }, ...prev]);
+          showToast('Thành công', 'Đã thêm khuyến mãi', 'success');
+        } else {
+          showToast('Lỗi', data.message, 'error');
+        }
+      })
+      .catch(err => console.error(err));
   };
 
   const handleTogglePromoStatus = (promoId: string) => {
-    setPromotions((prev) =>
-      prev.map((p) =>
-        p.id === promoId
-          ? { ...p, status: p.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE' }
-          : p
-      )
-    );
-    showToast('Cập nhật khuyến mãi', 'Đã thay đổi trạng thái hoạt động của voucher', 'info');
+    const promo = promotions.find(p => p.id === promoId);
+    if (!promo) return;
+    
+    const newStatus = promo.status === 'ĐANG CHẠY' ? 'TẠM DỪNG' : 'ĐANG CHẠY';
+    
+    fetch('/backend/admin_manage_promotions.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update_status', id: promoId, status: newStatus })
+    }).then(() => {
+      setPromotions((prev) =>
+        prev.map((p) =>
+          p.id === promoId ? { ...p, status: newStatus } : p
+        )
+      );
+      showToast('Cập nhật khuyến mãi', 'Đã thay đổi trạng thái hoạt động của voucher', 'info');
+    }).catch(err => console.error(err));
   };
 
   // News Handlers

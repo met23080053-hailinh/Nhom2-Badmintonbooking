@@ -14,7 +14,7 @@ import { PolicyModal } from './components/PolicyModal';
 import { Profile } from './components/Profile';
 import { AdminApp } from './adminApp/App';
 import { AdminLogin } from './adminApp/AdminLogin';
-import { MOCK_COURTS } from './data/courts';
+
 import { CourtFacility, BookingRecord } from './types';
 
 
@@ -55,7 +55,7 @@ export default function App() {
   const [userPhone, setUserPhone] = useState(savedUser?.userPhone || '');
   const [userId, setUserId] = useState<number | null>(savedUser?.userId || null);
 
-  const [courts, setCourts] = useState<any[]>(MOCK_COURTS);
+  const [courts, setCourts] = useState<any[]>([]);
 
   React.useEffect(() => {
     const handlePopState = () => {
@@ -81,17 +81,16 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [userRole]);
 
-  // React.useEffect(() => {
-  //   fetch(`/backend/get_courts.php`)
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       if(data.status === 'success') {
-  //         // Removed because DB data lacks fields (city, district, amenities, etc.)
-  //         // and breaks the filtering / UI consistency.
-  //       }
-  //     })
-  //     .catch(err => console.error("Lỗi lấy dữ liệu sân:", err));
-  // }, []);
+  React.useEffect(() => {
+    fetch(`/backend/get_courts.php`)
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'success') {
+          setCourts(data.data);
+        }
+      })
+      .catch(err => console.error("Lỗi lấy dữ liệu sân:", err));
+  }, []);
 
   // Tự động gọi API nhắc lịch (Cronjob mô phỏng) mỗi 1 phút (60000ms)
   React.useEffect(() => {
@@ -131,7 +130,7 @@ export default function App() {
 
   const handleHeroBookNow = () => {
     // Open booking modal for the featured elite arena or go to court list
-    setSelectedCourtForBooking(MOCK_COURTS[0]);
+    setSelectedCourtForBooking(courts.length > 0 ? courts[0] : null);
     setIsBookingModalOpen(true);
   };
 
@@ -323,7 +322,7 @@ export default function App() {
 
             {/* Featured Courts Grid matching screenshot */}
             <FeaturedCourts
-              courts={MOCK_COURTS.filter((c) => c.featured)}
+              courts={courts.filter((c) => c.featured)}
               onSelectCourt={handleOpenBookingForCourt}
               onViewAllClick={() => {
                 setCurrentTab('courts');

@@ -15,13 +15,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $name = $data->name ?? null;
     $location = $data->location ?? null;
+    $city = $data->city ?? 'Hà Nội';
+    $district = $data->district ?? 'Khác';
+    $phone = $data->phone ?? '0901234567';
+    $featured = $data->featured ?? 0;
+    $total_courts = $data->total_courts ?? 1;
+    $available_courts_count = $data->available_courts_count ?? 1;
+    $rating = $data->rating ?? 5.0;
+    $review_count = $data->review_count ?? 0;
+    
     $court_type = $data->court_type ?? 'STANDARD';
     $price_per_hour = $data->price_per_hour ?? null;
     $opening_time = $data->opening_time ?? '06:00:00';
     $closing_time = $data->closing_time ?? '22:00:00';
     $status = $data->status ?? 'AVAILABLE';
     $description = $data->description ?? '';
+    
     $images = $data->images ?? []; // Mảng đường dẫn ảnh
+    $amenities = $data->amenities ?? ['Wifi', 'Bãi đỗ xe'];
+    $sub_courts = $data->sub_courts ?? [];
 
     if (!$name || !$location || !$price_per_hour) {
         http_response_code(400);
@@ -31,10 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $images_json = json_encode($images);
+        $amenities_json = json_encode($amenities);
+        $sub_courts_json = json_encode($sub_courts);
 
-        $sql = "INSERT INTO courts (name, location, court_type, price_per_hour, opening_time, closing_time, status, description, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO courts (name, location, city, district, phone, featured, total_courts, available_courts_count, rating, review_count, court_type, price_per_hour, opening_time, closing_time, status, description, images, amenities, sub_courts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$name, $location, $court_type, $price_per_hour, $opening_time, $closing_time, $status, $description, $images_json]);
+        $stmt->execute([$name, $location, $city, $district, $phone, $featured, $total_courts, $available_courts_count, $rating, $review_count, $court_type, $price_per_hour, $opening_time, $closing_time, $status, $description, $images_json, $amenities_json, $sub_courts_json]);
 
         http_response_code(201);
         echo json_encode(["status" => "success", "message" => "Thêm sân mới thành công!", "court_id" => $pdo->lastInsertId()]);

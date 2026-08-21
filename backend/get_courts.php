@@ -14,7 +14,7 @@ require 'db_connection.php';
 
 try {
     // Viết câu lệnh SQL cơ bản
-    $sql = "SELECT id, name, location, court_type, price_per_hour, opening_time, closing_time, status, description, images FROM courts WHERE 1=1";
+    $sql = "SELECT id, name, location, city, district, rating, review_count, phone, featured, total_courts, available_courts_count, court_type, price_per_hour, opening_time, closing_time, status, description, amenities, sub_courts, images FROM courts WHERE 1=1";
     $params = [];
 
     // Xử lý lọc theo quận (district/location)
@@ -62,6 +62,31 @@ try {
         } else {
             $court['images'] = []; // Trả về mảng rỗng nếu chưa có ảnh
         }
+        
+        if (!empty($court['amenities'])) {
+            $court['amenities'] = json_decode($court['amenities']);
+        } else {
+            $court['amenities'] = [];
+        }
+        
+        if (!empty($court['sub_courts'])) {
+            $court['sub_courts'] = json_decode($court['sub_courts']);
+        } else {
+            $court['sub_courts'] = [];
+        }
+        
+        // Transform keys to match frontend CourtFacility interface exactly
+        $court['reviewCount'] = (int)$court['review_count'];
+        $court['pricePerHour'] = (float)$court['price_per_hour'];
+        $court['formattedPrice'] = number_format((float)$court['price_per_hour'], 0, ',', '.') . ' VNĐ';
+        $court['openingHours'] = substr($court['opening_time'], 0, 5) . ' - ' . substr($court['closing_time'], 0, 5);
+        $court['totalCourts'] = (int)$court['total_courts'];
+        $court['availableCourtsCount'] = (int)$court['available_courts_count'];
+        $court['featured'] = (bool)$court['featured'];
+        $court['subCourts'] = $court['sub_courts'];
+        $court['imageUrl'] = !empty($court['images']) ? $court['images'][0] : '/images/preview (3).webp';
+        $court['galleryImages'] = $court['images'];
+        $court['statusBadge'] = $court['status'] === 'AVAILABLE' ? 'ĐANG TRỐNG' : 'BẢO TRÌ';
     }
 
     // Trả về cục dữ liệu JSON thành công
