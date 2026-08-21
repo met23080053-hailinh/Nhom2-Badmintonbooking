@@ -22,7 +22,10 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<'week' | 'month' | 'day'>('week');
   const [selectedCourtFilter, setSelectedCourtFilter] = useState<string>('all');
-  const [currentMonthStr, setCurrentMonthStr] = useState('Tháng 8, 2024');
+  // Compute real current month label
+  const now = new Date();
+  const monthNames = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+  const [currentMonthStr, setCurrentMonthStr] = useState(`${monthNames[now.getMonth()]}, ${now.getFullYear()}`);
 
   // Current Time State
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -78,7 +81,7 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
       date: bookingDate,
       dayOfWeek: dayOfWeek,
       dayLabel: dayOfWeek === 1 ? 'T2' : dayOfWeek === 2 ? 'T3' : dayOfWeek === 3 ? 'T4' : dayOfWeek === 4 ? 'T5' : dayOfWeek === 5 ? 'T6' : dayOfWeek === 6 ? 'T7' : 'CN',
-      dayNumber: 12 + (dayOfWeek - 1),
+      dayNumber: bookingDate ? new Date(bookingDate).getDate() : new Date().getDate(),
       startTime,
       endTime,
       durationHours: duration,
@@ -124,15 +127,34 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
     timeSlots.push(`${hour}:00`);
   }
 
-  const daysHeader = [
-    { label: 'T2', num: 12, dayOfWeek: 1 },
-    { label: 'T3', num: 13, dayOfWeek: 2, active: true },
-    { label: 'T4', num: 14, dayOfWeek: 3 },
-    { label: 'T5', num: 15, dayOfWeek: 4 },
-    { label: 'T6', num: 16, dayOfWeek: 5 },
-    { label: 'T7', num: 17, dayOfWeek: 6 },
-    { label: 'CN', num: 18, dayOfWeek: 0, isSunday: true },
-  ];
+  // ===== DYNAMIC WEEK CALCULATION =====
+  // Get current week's Monday
+  const getWeekDays = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    // Adjust so Monday is start of week
+    const monday = new Date(today);
+    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // if Sunday, go back 6 days
+    monday.setDate(today.getDate() + diff);
+    monday.setHours(0, 0, 0, 0);
+
+    const labels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+    const dowValues = [1, 2, 3, 4, 5, 6, 0]; // Mon=1...Sun=0 in JS getDay()
+    return labels.map((label, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return {
+        label,
+        num: d.getDate(),
+        month: d.getMonth() + 1,
+        dayOfWeek: dowValues[i],
+        isSunday: label === 'CN',
+        active: d.toDateString() === today.toDateString(), // highlight today
+        fullDate: d.toISOString().split('T')[0],
+      };
+    });
+  };
+  const daysHeader = getWeekDays();
 
   return (
     <div className="flex flex-col w-full gap-6 pb-12 animate-in fade-in duration-300">
