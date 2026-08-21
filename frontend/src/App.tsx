@@ -108,40 +108,43 @@ export default function App() {
 
   const [userBookings, setUserBookings] = useState<BookingRecord[]>([]);
 
+  const refreshBookings = React.useCallback(() => {
+    if (!userId) return;
+    fetch(`/backend/get_bookings.php?user_id=${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'success') {
+          const mappedBookings = data.data.map((b: any) => ({
+            id: 'book-' + b.id,
+            bookingCode: 'BB-' + b.id,
+            facilityId: b.court_id,
+            facilityName: 'Sân Cầu Lông ' + b.court_id,
+            facilityLocation: '',
+            facilityImage: '/images/preview (3).webp',
+            courtNumber: 'Sân ' + b.court_id,
+            date: b.start_time,
+            timeSlots: [b.start_time],
+            totalHours: 1,
+            totalAmount: Number(b.total_price),
+            formattedTotalAmount: Number(b.total_price).toLocaleString('vi-VN') + ' VND',
+            status: b.status === 'confirmed' ? 'CONFIRMED' : 'PENDING',
+            playerName: userName,
+            playerPhone: userPhone,
+            playerEmail: userEmail,
+            paymentMethod: 'Tiền mặt',
+            createdAt: b.created_at,
+            qrCodeSeed: 'BB-' + b.id,
+          }));
+          setUserBookings(mappedBookings);
+        }
+      })
+      .catch(err => console.error("Lỗi lấy lịch sử:", err));
+  }, [userId, userName, userPhone, userEmail]);
+
   // Lấy lịch sử đặt sân ngay khi tải lại trang nếu đã đăng nhập
   React.useEffect(() => {
-    if (userId) {
-      fetch(`/backend/get_bookings.php?user_id=${userId}`)
-        .then(res => res.json())
-        .then(data => {
-          if(data.status === 'success') {
-            const mappedBookings = data.data.map((b: any) => ({
-              id: 'book-' + b.id,
-              bookingCode: 'BB-' + b.id,
-              facilityId: b.court_id,
-              facilityName: 'Sân Cầu Lông ' + b.court_id,
-              facilityLocation: '',
-              facilityImage: '/images/preview (3).webp',
-              courtNumber: 'Sân ' + b.court_id,
-              date: b.start_time,
-              timeSlots: [b.start_time],
-              totalHours: 1,
-              totalAmount: Number(b.total_price),
-              formattedTotalAmount: Number(b.total_price).toLocaleString('vi-VN') + ' VND',
-              status: b.status === 'confirmed' ? 'CONFIRMED' : 'PENDING',
-              playerName: userName,
-              playerPhone: userPhone,
-              playerEmail: userEmail,
-              paymentMethod: 'Tiền mặt',
-              createdAt: b.created_at,
-              qrCodeSeed: 'BB-' + b.id,
-            }));
-            setUserBookings(mappedBookings);
-          }
-        })
-        .catch(err => console.error("Lỗi lấy lịch sử:", err));
-    }
-  }, [userId, userName, userPhone, userEmail]);
+    refreshBookings();
+  }, [refreshBookings]);
 
   // Search filter criteria passed from Hero
   const [searchDistrict, setSearchDistrict] = useState('Tất cả khu vực');
@@ -296,7 +299,10 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         userBookings={userBookings.filter((b) => b.status === 'CONFIRMED')}
-        onOpenBookings={() => setIsBookingsDrawerOpen(true)}
+        onOpenBookings={() => {
+          refreshBookings();
+          setIsBookingsDrawerOpen(true);
+        }}
         onOpenAuth={(intent = 'customer') => {
           if (intent === 'admin') {
             setCurrentTab('admin-login');
