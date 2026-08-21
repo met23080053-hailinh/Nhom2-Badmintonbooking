@@ -49,7 +49,7 @@ This is a comprehensive web-based business application designed for Badminton Co
 
 ## 5. Test Accounts
 - **Admin Account:** 
-  - Email: `admin@badminton.vn` (Hoặc `admin@badminton.com`)
+  - Email: `admin@badminton.vn` 
   - Password: `123456`
 - **Customer Account:**
   - Email: `nva@example.com`
