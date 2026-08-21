@@ -145,7 +145,7 @@ export const FindPartnerView: React.FC<FindPartnerViewProps> = ({ courts, onBook
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         user_id: 1, // Tạm fix cứng user_id demo
-        court_id: parseInt(facility.id.replace('court-', '')) || 1,
+        court_id: parseInt(String(facility.id).replace('court-', '')) || 1,
         play_date: new Date().toISOString().split('T')[0], // Lấy ngày hôm nay
         start_time: startTimeStr,
         end_time: endTimeStr,

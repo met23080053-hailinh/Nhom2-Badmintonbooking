@@ -141,37 +141,6 @@ export default function App() {
 
   const handleNewBookingCreated = (newBooking: BookingRecord) => {
     setUserBookings([newBooking, ...userBookings]);
-
-    // Format start and end time from timeSlots array (e.g. ['19:00 - 20:00', '20:00 - 21:00'])
-    const startTimeStr = newBooking.timeSlots[0] ? newBooking.timeSlots[0].split(' - ')[0] : '00:00';
-    const lastSlot = newBooking.timeSlots[newBooking.timeSlots.length - 1];
-    const endTimeStr = lastSlot ? lastSlot.split(' - ')[1] : '01:00';
-
-    // Fake a valid MySQL Date YYYY-MM-DD for demo (or use real parsed date)
-    const today = new Date().toISOString().split('T')[0];
-    const mysqlStartTime = `${today} ${startTimeStr}:00`;
-    const mysqlEndTime = `${today} ${endTimeStr}:00`;
-
-    // 2. Gửi dữ liệu thật về Backend PHP
-    fetch(`/backend/create_booking.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: userId || 1, // Dùng biến userId thật thay vì số 1 (dự phòng 1 nếu null)
-        court_id: parseInt(newBooking.facilityId.replace('court-', '')) || 1,
-        start_time: mysqlStartTime,
-        end_time: mysqlEndTime,
-        total_price: newBooking.totalAmount
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      console.log("Phản hồi từ Database:", data);
-      if (data.status !== 'success') {
-        alert("Lỗi lưu vào DB: " + data.message);
-      }
-    })
-    .catch(err => console.error("Lỗi lưu đơn:", err));
   };
 
   const handleCancelBooking = (bookingId: string) => {

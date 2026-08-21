@@ -14,10 +14,10 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'OPTIONS'
 header("Content-Type: application/json; charset=UTF-8");
 
 // Thông tin kết nối Database
-$host = 'sql308.infinityfree.com';
-$db_name = 'if0_42645833_badmintonbooking';
-$username = 'if0_42645833'; 
-$password = 'Hailinh12340';     
+$host = 'localhost';
+$db_name = 'badminton_db';
+$username = 'root'; 
+$password = '';     
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db_name;charset=$charset";

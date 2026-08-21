@@ -165,7 +165,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         user_id: userId,
-        court_id: parseInt(court.id.replace('court-', '')) || 1,
+        court_id: parseInt(String(court.id).replace('court-', '')) || 1,
         start_time: `2026-10-24 ${startTimeStr}`, // Hardcoded date for demo
         end_time: `2026-10-24 ${endTimeStr}`,
         player_name: playerName,

@@ -28,18 +28,16 @@ This is a comprehensive web-based business application designed for Badminton Co
 ### Step-by-step Setup
 1. **Database Import:**
    - Open phpMyAdmin (usually `http://localhost/phpmyadmin`).
-   - Create a new database named `badminton_booking_db`.
-   - Import the provided file `HSB2006_MET5_23080053_DoHaiLinh_Database.sql`.
+   - Create a new database named `badminton_db`.
+   - Note: You DO NOT need to import any SQL file manually. Proceed to step 2 to run the automatic database initializer.
    *(Note: The database contains all schema and sample data required for assessment).*
 
 2. **Backend Setup:**
-   - Move the `backend` folder into your XAMPP `htdocs` directory (e.g. `C:\xampp\htdocs\badminton-booking-backend`).
-   - Open `backend/db_connection.php` and verify the `$username` and `$password` match your MySQL setup (default is `root` and empty password).
-   - Ensure your PHP server is running on port `8000`. (If you use another port, update the API URLs in the React frontend). You can also run it via terminal:
-     ```bash
-     cd backend
-     php -S localhost:8000
-     ```
+   - Ensure you have XAMPP installed and running (Apache and MySQL).
+   - Move the entire project folder to `C:\xampp\htdocs\badminton-booking-project`.
+   - The backend API will be accessible at `http://localhost/badminton-booking-project/backend/`
+   - *Alternative (Vite proxy mode):* You can also copy the `backend` folder directly to `C:\xampp\htdocs\backend` to allow the React development server to proxy requests automatically.
+   - Run the automatic database upgrade script by visiting `http://localhost/backend/upgrade_db.php` in your browser. This will create all tables and insert sample data (including Admin and Customer accounts).
 
 3. **Frontend Setup:**
    - Open a terminal and navigate to the `frontend` folder.
@@ -51,8 +49,8 @@ This is a comprehensive web-based business application designed for Badminton Co
 - **Admin Account:** 
   - Email: `admin@badminton.vn` 
   - Password: `123456`
-- **Customer Account:**
-  - Email: `nva@example.com`
+- **Customer Account (Demo):**
+  - Email: `khachhang@example.com`
   - Password: `123456`
 
 ## 6. Third-Party Libraries & Assets

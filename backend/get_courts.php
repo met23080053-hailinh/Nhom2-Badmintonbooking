@@ -76,6 +76,8 @@ try {
         }
         
         // Transform keys to match frontend CourtFacility interface exactly
+        $court['id'] = (int)$court['id'];
+        $court['rating'] = (float)$court['rating'];
         $court['reviewCount'] = (int)$court['review_count'];
         $court['pricePerHour'] = (float)$court['price_per_hour'];
         $court['formattedPrice'] = number_format((float)$court['price_per_hour'], 0, ',', '.') . ' VNĐ';

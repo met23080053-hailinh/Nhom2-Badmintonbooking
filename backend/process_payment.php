@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        $stmt = $pdo->prepare("UPDATE bookings SET status = 'PENDING_PAYMENT' WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE bookings SET status = 'pending' WHERE id = ?");
         $stmt->execute([$booking_id]);
 
         $pdo->commit();

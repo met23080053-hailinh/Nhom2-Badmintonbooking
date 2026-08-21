@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Tạo mã có dạng: BKG-YYYYMMDD-HệSốNgẫuNhiên
             $booking_code = 'BKG-' . date('Ymd') . '-' . rand(1000, 9999);
 
-            $insert_sql = "INSERT INTO bookings (booking_code, user_id, court_id, start_time, end_time, total_price, status) VALUES (?, ?, ?, ?, ?, ?, 'PENDING')";
+            $insert_sql = "INSERT INTO bookings (booking_code, user_id, court_id, start_time, end_time, total_price, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')";
             $insert_stmt = $pdo->prepare($insert_sql);
             
             if ($insert_stmt->execute([$booking_code, $user_id, $court_id, $start_time, $end_time, $total_price])) {

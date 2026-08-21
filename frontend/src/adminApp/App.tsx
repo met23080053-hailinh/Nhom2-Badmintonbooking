@@ -206,7 +206,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        court_id: court.id.replace('court-', ''),
+        court_id: String(court.id).replace('court-', ''),
         name: court.name,
         location: court.location,
         court_type: court.type === 'vip' ? 'VIP' : 'STANDARD',
@@ -227,7 +227,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
   };
 
   const handleDeleteCourt = (courtId: string) => {
-    fetch(`/backend/delete_court.php?id=${courtId.replace('court-', '')}`, {
+    fetch(`/backend/delete_court.php?id=${String(courtId).replace('court-', '')}`, {
       method: 'POST'
     })
       .then(res => res.json())
