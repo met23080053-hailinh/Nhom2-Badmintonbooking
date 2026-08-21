@@ -45,7 +45,9 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
           const apiCourts = data.data.map((c: any) => ({
             id: 'court-' + c.id,
             name: c.name,
-            location: c.location,
+            image: c.images && c.images.length > 0 ? c.images[0] : '/images/preview (3).webp',
+            description: c.description,
+            area: c.location,
             type: c.court_type || 'Sân đôi',
             pricePerHour: c.pricePerHour,
             status: c.status === 'AVAILABLE' ? 'HOẠT ĐỘNG' : 'BẢO TRÌ'
