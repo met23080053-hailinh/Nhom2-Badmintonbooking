@@ -1,5 +1,5 @@
-# MET5 - 23080053- ĐỖ HẢI LINH - NHÓM 2
-**Badminton Booking & Management System (Final Project)**
+# MET5 - NHÓM 2
+**Badminton Booking & Management System**
 
 ## 1. Project Purpose & Executive Summary
 This is a comprehensive web-based business application designed for Badminton Court Owners and Players. It solves the real-world business problem of manual court reservations, scattered matchmaking, and inefficient payment tracking. 
@@ -65,5 +65,4 @@ This is a comprehensive web-based business application designed for Badminton Co
 - The system currently supports simulated QR Bank Transfer. Direct Gateway API (e.g., VNPAY/MOMO) is mocked to fit the scope of a university project.
 - Real-time WebSockets are not used; the dashboard updates on mount or via action triggers.
 
----
-*This repository and application are submitted as the final examination requirement for VNU HSB2006 - MET5.*
+
