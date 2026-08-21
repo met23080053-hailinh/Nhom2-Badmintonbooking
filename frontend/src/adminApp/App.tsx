@@ -44,6 +44,8 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
   const [courts, setCourts] = useState<Court[]>(initialCourts);
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
 
+  const [payments, setPayments] = useState<PaymentTransaction[]>(initialPayments);
+
   React.useEffect(() => {
     fetch(`/backend/get_bookings.php`)
       .then(res => res.json())
@@ -64,12 +66,26 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
             createdAt: b.created_at
           }));
           setBookings(realBookings);
+
+          const realPayments = data.data.map((b: any) => ({
+            id: 'TXN-' + b.id,
+            bookingId: 'BB-' + b.id,
+            guestName: b.user_name || 'Khách Hàng',
+            guestInitials: (b.user_name || 'KH').substring(0, 2).toUpperCase(),
+            amount: Number(b.total_price),
+            method: 'qr',
+            status: b.status === 'confirmed' ? 'paid' : (b.status === 'cancelled' ? 'failed' : 'pending'),
+            dateStr: b.start_time.split(' ')[0],
+            timeStr: b.start_time.split(' ')[1].substring(0,5),
+            fullTimestamp: b.created_at || b.start_time,
+            proofImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAV08JBewCJ4pTT6fjtU2JDtk5lAeh4Aq57XPDR-_snCr5U212qnf3XpgjPRu8E5C7KKtXlFy1wYdCQ6EWWd3vCU0D_YtVf5x1iCcn8VDIF0j7VpZLd2FYYmUCGN3ZhfDrVHFfDjvEoSlou2okxrq_gdixOG-VrHJrkhLFgI3V9OY1rkVOzivujZzzKu2i3f9a55xs-Q5K-458KNvhQSMN5yRToV5qNaKWuC9RVOqxUzD89jSzTMeuQ'
+          }));
+          setPayments(realPayments);
         }
       })
       .catch(err => console.error(err));
   }, []);
 
-  const [payments, setPayments] = useState<PaymentTransaction[]>(initialPayments);
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [promotions, setPromotions] = useState<Promotion[]>(initialPromotions);
   const [news, setNews] = useState<NewsArticle[]>([]);
@@ -172,6 +188,14 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
   };
 
   const handleUpdateBookingStatus = (bookingId: string, newStatus: BookingStatus) => {
+    const bId = bookingId.replace('BB-', '');
+    const apiStatus = newStatus === 'Paid' ? 'CONFIRMED' : (newStatus === 'Cancelled' ? 'CANCELLED' : 'PENDING');
+    fetch('/backend/update_booking_status.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_id: bId, status: apiStatus })
+    }).catch(err => console.error(err));
+
     setBookings((prev) =>
       prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b))
     );
@@ -194,16 +218,25 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
     status: PaymentStatus,
     reason?: string
   ) => {
-    setPayments((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, status, rejectionReason: reason } : p))
-    );
     const targetTxn = payments.find((p) => p.id === id);
     if (targetTxn) {
+      const bId = targetTxn.bookingId.replace('BB-', '');
+      const apiStatus = status === 'paid' ? 'CONFIRMED' : (status === 'failed' ? 'CANCELLED' : 'PENDING');
+      fetch('/backend/update_booking_status.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ booking_id: bId, status: apiStatus })
+      }).catch(err => console.error(err));
+
       const bStatus: BookingStatus = status === 'paid' ? 'Paid' : status === 'failed' ? 'Cancelled' : 'Pending';
       setBookings((prev) =>
         prev.map((b) => (b.id === targetTxn.bookingId ? { ...b, status: bStatus } : b))
       );
     }
+
+    setPayments((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, status, rejectionReason: reason } : p))
+    );
   };
 
   // User Handlers
