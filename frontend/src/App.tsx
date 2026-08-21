@@ -98,7 +98,9 @@ export default function App() {
       fetch(`/backend/reminder_cron.php`)
         .then(res => res.text())
         .then(text => {
-          console.log("[Hệ Thống Nhắc Lịch Tự Động]:\n" + text);
+          if (text.includes('Nhắc nhở:')) {
+            alert("[Hệ Thống Nhắc Lịch]:\n" + text);
+          }
         })
         .catch(err => console.error("Lỗi chạy Cronjob:", err));
     }, 60000); // 1 phút

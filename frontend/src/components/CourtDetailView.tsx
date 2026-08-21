@@ -247,7 +247,14 @@ export const CourtDetailView: React.FC<CourtDetailViewProps> = ({ court, onBookN
                   <span>{court.openingHours} hàng ngày</span>
                 </div>
               </div>
-              <button className="mt-5 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:bg-secondary hover:text-ink transition-colors">
+              <button 
+                onClick={() => {
+                  const phone = court.phone || '0987400019';
+                  const zaloLink = `https://zalo.me/${phone.replace(/[^0-9]/g, '')}`;
+                  window.open(zaloLink, '_blank');
+                }}
+                className="mt-5 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:bg-secondary hover:text-ink transition-colors"
+              >
                 <MessageSquare className="w-4 h-4" /> Chat với chủ sân
               </button>
             </div>
