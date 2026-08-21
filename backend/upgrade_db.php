@@ -163,27 +163,46 @@ try {
         ");
     }
 
-    // 6. Tạo bảng Partner Requests
+    // 6. Tạo bảng Matchmaking (Tìm bạn chơi)
     $pdo->exec("
-    CREATE TABLE IF NOT EXISTS partner_requests (
+    CREATE TABLE IF NOT EXISTS matchmaking (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
+        user_id INT NOT NULL,
         court_id INT,
-        level VARCHAR(100),
-        date_str VARCHAR(100),
-        time_str VARCHAR(100),
-        players_needed INT DEFAULT 1,
-        contact_name VARCHAR(100),
-        contact_phone VARCHAR(20),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        play_date DATE NOT NULL,
+        start_time TIME NOT NULL,
+        end_time TIME NOT NULL,
+        required_level VARCHAR(100) DEFAULT 'Mọi trình độ',
+        note TEXT,
+        status ENUM('OPEN', 'CLOSED', 'CANCELLED') DEFAULT 'OPEN',
+        spots_needed INT DEFAULT 1,
+        spots_filled INT DEFAULT 0,
+        cost_per_person VARCHAR(100) DEFAULT 'Thỏa thuận',
+        gender_req VARCHAR(50) DEFAULT 'Bất kỳ',
+        court_number VARCHAR(100) DEFAULT 'Sân 1',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (court_id) REFERENCES courts(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ");
 
-    $stmt = $pdo->query("SELECT COUNT(*) FROM partner_requests");
+    // 7. Tạo bảng Matchmaking Participants
+    $pdo->exec("
+    CREATE TABLE IF NOT EXISTS matchmaking_participants (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        matchmaking_id INT NOT NULL,
+        user_name VARCHAR(255) NOT NULL,
+        user_phone VARCHAR(20) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (matchmaking_id) REFERENCES matchmaking(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ");
+
+    $stmt = $pdo->query("SELECT COUNT(*) FROM matchmaking");
     if ($stmt->fetchColumn() == 0) {
-        $pdo->exec("INSERT INTO partner_requests (title, court_id, level, date_str, time_str, players_needed, contact_name, contact_phone) VALUES 
-        ('Tìm cặp đánh đôi nam tối thứ 6', 1, 'Trung Bình - Khá', 'Thứ 6, 26/10', '19:00 - 21:00', 2, 'Hoàng', '0912345678'),
-        ('Giao lưu nam nữ dưỡng sinh', 2, 'Cơ Bản', 'Chủ Nhật, 28/10', '08:00 - 10:00', 4, 'Lan Anh', '0987654321')
+        $pdo->exec("INSERT INTO matchmaking (user_id, court_id, play_date, start_time, end_time, required_level, note, spots_needed, cost_per_person, gender_req, court_number) VALUES 
+        (1, 1, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '19:00:00', '21:00:00', 'Trung Bình - Khá', 'Cần 2 bạn đánh đôi nam tối thứ 6', 2, '50.000 VNĐ', 'Nam', 'Sân 3'),
+        (2, 2, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '08:00:00', '10:00:00', 'Cơ Bản', 'Giao lưu nam nữ sáng cuối tuần vui vẻ', 4, 'Free', 'Bất kỳ', 'Sân 2')
         ");
     }
 
