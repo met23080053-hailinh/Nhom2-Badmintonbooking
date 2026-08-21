@@ -310,6 +310,7 @@ export const FindPartnerView: React.FC<FindPartnerViewProps> = ({ courts, onBook
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {filteredRequests.map((req) => {
             const isJoined = joinedMatches.includes(req.id);
+            const hasJoinedAnyGroup = joinedMatches.length > 0;
             const spotsRemaining = Math.max(0, req.spotsNeeded - req.spotsFilled);
             const isFull = spotsRemaining === 0;
 
@@ -409,8 +410,9 @@ export const FindPartnerView: React.FC<FindPartnerViewProps> = ({ courts, onBook
 
                   <button
                     onClick={() => handleJoinMatch(req.id, (req as any).dbId)}
-                    disabled={isFull || isJoined}
-                    className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${isFull
+                    disabled={isFull || isJoined || (!isJoined && hasJoinedAnyGroup)}
+                    className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                      isFull || (!isJoined && hasJoinedAnyGroup)
                       ? 'bg-ink/5 text-ink/40 cursor-not-allowed'
                       : isJoined
                         ? 'bg-earth-primary text-white cursor-default'
@@ -425,7 +427,7 @@ export const FindPartnerView: React.FC<FindPartnerViewProps> = ({ courts, onBook
                     ) : (
                       <>
                         <UserPlus className="w-4 h-4" />
-                        <span>Tham gia (còn {spotsRemaining} chỗ)</span>
+                        <span>{(!isJoined && hasJoinedAnyGroup) ? "Bạn đã tham gia nhóm khác" : `Tham gia (còn ${spotsRemaining} chỗ)`}</span>
                       </>
                     )}
                   </button>
