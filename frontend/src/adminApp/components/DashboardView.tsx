@@ -240,38 +240,58 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <>
                       <path d="M 0 248 L 800 248 L 800 250 L 0 250 Z" fill="url(#areaGradient)" />
                       <path d="M 0 248 L 800 248" fill="none" stroke="var(--admin-primary)" strokeLinecap="round" strokeWidth="4" />
+                      <text fill="rgba(15,23,42,0.45)" fontSize="12" textAnchor="middle" x="400" y="230">Chưa có dữ liệu trong khoảng thời gian này</text>
                     </>
                   );
                 }
-                const max = Math.max(...data, 100000); // minimum scale
-                const stepX = 800 / Math.max(data.length - 1, 1);
-                
-                let linePath = `M 0 ${240 - (data[0] / max) * 190}`;
-                for (let i = 1; i < data.length; i++) {
-                  linePath += ` L ${i * stepX} ${240 - (data[i] / max) * 190}`;
+
+                const max = Math.max(...data);
+                // If only 1 point, draw flat horizontal line at that value
+                if (data.length === 1) {
+                  const y = 240 - (data[0] / max) * 190;
+                  return (
+                    <>
+                      <path d={`M 0 ${y} L 800 ${y} L 800 250 L 0 250 Z`} fill="url(#areaGradient)" />
+                      <path d={`M 0 ${y} L 800 ${y}`} fill="none" stroke="var(--admin-primary)" strokeLinecap="round" strokeWidth="4" />
+                      <circle cx="400" cy={y} r="7" fill="var(--admin-bg-card)" stroke="var(--admin-primary)" strokeWidth="3.5"
+                        onMouseEnter={() => setHoveredPoint({ day: chartData[0]?.date ?? '', value: data[0].toLocaleString('vi-VN') + ' VNĐ', x: 400, y })}
+                        onMouseLeave={() => setHoveredPoint(null)}
+                      />
+                    </>
+                  );
                 }
-                const areaPath = `${linePath} L 800 250 L 0 250 Z`;
+
+                // Multiple points
+                const stepX = 800 / (data.length - 1);
+                const points = data.map((val, i) => ({ x: i * stepX, y: 240 - (val / max) * 190 }));
+                let linePath = `M ${points[0].x} ${points[0].y}`;
+                for (let i = 1; i < points.length; i++) {
+                  // Smooth curve using quadratic bezier
+                  const mx = (points[i-1].x + points[i].x) / 2;
+                  linePath += ` Q ${mx} ${points[i-1].y} ${points[i].x} ${points[i].y}`;
+                }
+                const lastP = points[points.length - 1];
+                const areaPath = `${linePath} L ${lastP.x} 250 L 0 250 Z`;
 
                 return (
                   <>
                     <path d={areaPath} fill="url(#areaGradient)" />
                     <path d={linePath} fill="none" stroke="var(--admin-primary)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" />
-                    {/* Draw points */}
-                    {data.map((val: number, i: number) => (
-                      <circle 
-                        key={i} 
-                        cx={i * stepX} 
-                        cy={240 - (val / max) * 190} 
-                        r="5" 
-                        fill="var(--admin-bg-card)" 
-                        stroke="var(--admin-primary)" 
-                        strokeWidth="3.5" 
-                        className="cursor-pointer hover:r-8 transition-all"
-                        onMouseEnter={() => setHoveredPoint({ 
-                          day: chartData[i]?.date ?? '', 
-                          value: val.toLocaleString('vi-VN') + ' VNĐ', 
-                          x: i * stepX, 
-                          y: 240 - (val / max) * 190 
+                    {points.map((p, i) => (
+                      <circle
+                        key={i}
+                        cx={p.x}
+                        cy={p.y}
+                        r="5"
+                        fill="var(--admin-bg-card)"
+                        stroke="var(--admin-primary)"
+                        strokeWidth="3.5"
+                        className="cursor-pointer"
+                        onMouseEnter={() => setHoveredPoint({
+                          day: chartData[i]?.date ?? '',
+                          value: data[i].toLocaleString('vi-VN') + ' VNĐ',
+                          x: p.x,
+                          y: p.y
                         })}
                         onMouseLeave={() => setHoveredPoint(null)}
                       />
@@ -280,16 +300,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 );
               })()}
 
-              {/* Dynamic X-Axis Labels */}
+              {/* Dynamic X-Axis Labels - fix timezone by splitting date string */}
               {(() => {
                 const dates = chartData.map((r: any) => {
-                  const d = new Date(r.date);
-                  return d.getDate() + '/' + (d.getMonth() + 1);
+                  // Parse as local date to avoid UTC offset shifting day
+                  const parts = String(r.date).split('-');
+                  return `${parseInt(parts[2])}/${parseInt(parts[1])}`;
                 });
                 if (dates.length === 0) return null;
-                const stepX = 800 / Math.max(dates.length - 1, 1);
+                const stepX = dates.length === 1 ? 800 : 800 / (dates.length - 1);
+                const startX = dates.length === 1 ? 400 : 0;
                 return dates.map((dateStr: string, i: number) => (
-                  <text key={i} fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="middle" x={i * stepX} y="270">
+                  <text key={i} fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="middle" x={startX + i * stepX} y="270">
                     {dateStr}
                   </text>
                 ));
