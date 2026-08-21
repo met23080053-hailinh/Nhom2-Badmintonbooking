@@ -48,7 +48,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
             location: c.location,
             type: c.court_type || 'Sân đôi',
             pricePerHour: c.pricePerHour,
-            status: c.status === 'AVAILABLE' ? 'active' : 'maintenance'
+            status: c.status === 'AVAILABLE' ? 'HOẠT ĐỘNG' : 'BẢO TRÌ'
           }));
           setCourts(apiCourts);
         }
