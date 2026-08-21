@@ -55,7 +55,7 @@ export const MyBookingsModal: React.FC<MyBookingsModalProps> = ({
               <div className="w-14 h-14 rounded-full bg-primary/5 text-primary flex items-center justify-center mx-auto">
                 <Calendar className="w-7 h-7" />
               </div>
-              <h3 className="font-bold text-ink text-base">No active reservations yet</h3>
+              <h3 className="font-bold text-ink text-base">Chưa có lịch đặt sân nào</h3>
               <p className="text-xs text-ink/60 max-w-xs mx-auto">
                 Bạn đã sẵn sàng? Chọn một sân và đặt ngay giờ chơi yêu thích.
               </p>
@@ -67,7 +67,7 @@ export const MyBookingsModal: React.FC<MyBookingsModalProps> = ({
                 }}
                 className="mt-2 bg-primary hover:bg-secondary hover:text-ink text-surface text-base font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
               >
-                <span>Browse Courts</span>
+                <span>Xem Danh Sách Sân</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

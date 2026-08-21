@@ -163,7 +163,7 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-earth-main tracking-tight">Quản lý đặt sân</h1>
           <p className="text-sm mt-1 text-earth-muted">
-            Manage court schedules, view booking statuses, and add manual reservations.
+            Quản lý lịch sân, xem trạng thái đơn đặt và thêm đơn thủ công.
           </p>
         </div>
 
