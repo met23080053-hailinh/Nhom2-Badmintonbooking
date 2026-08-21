@@ -1,66 +1,62 @@
-# MET5 - NHÓM 2
-**Badminton Booking & Management System**
+# HSB2006 - MET5 - NHÓM 2
+**Hệ Thống Đặt Lịch & Quản Lý Sân Cầu Lông (Badminton Booking & Management System)**
 
-## 1. Project Purpose & Executive Summary
-This is a comprehensive web-based business application designed for Badminton Court Owners and Players. It solves the real-world business problem of manual court reservations, scattered matchmaking, and inefficient payment tracking. 
-- **For Players (Customers):** View available courts, book slots, make QR payments, and find partners (Matchmaking).
-- **For Managers (Admins):** Manage users, confirm bookings, track revenue statistics in real-time, and publish news/promotions.
+---
 
-## 2. Features & Functional Scope
-- **User Authentication:** Registration and Login with encrypted passwords (BCrypt).
-- **Role-based Access Control:** Distinct workflows for `ADMIN` and `CUSTOMER`.
-- **Dynamic Booking Workflow:** Pending -> Pending Payment (QR/Bank) -> Confirmed (Admin side).
-- **Matchmaking System:** Players can create requests to find partners (specifying gender, cost, spots needed).
-- **Admin Dashboard:** Real-time revenue charts, court occupancy, user statistics, and user management.
-- **News & Promotions:** Admins can publish news dynamically which syncs to the customer homepage.
+## ⚠️ HƯỚNG DẪN CÀI ĐẶT NHANH DÀNH CHO GIẢNG VIÊN (QUAN TRỌNG) ⚠️
+Để hệ thống hoạt động chính xác (đặc biệt là tính năng kết nối API), xin thầy vui lòng thực hiện đúng theo các bước dưới đây:
 
-## 3. Technology Stack & Architecture
-- **Frontend:** React, TypeScript, TailwindCSS (Vite Build System).
-- **Backend:** PHP (PDO) acting as RESTful APIs.
-- **Database:** MySQL / MariaDB (Relational Database).
-- **Security:** Prepared Statements against SQL Injection (`PDO::ATTR_EMULATE_PREPARES = false`), Password Hashing, HTML input validation.
+### 1. Chuẩn bị Môi trường
+- **XAMPP** (hoặc môi trường PHP/MySQL tương đương).
+- **Node.js** (Phiên bản v18 trở lên).
 
-## 4. Installation & Setup Instructions
-### Prerequisites
-- XAMPP / MAMP or any server running PHP 8+ and MySQL.
-- Node.js (v18+) and npm.
+### 2. Cài đặt Cơ sở dữ liệu (MySQL)
+- Mở bảng điều khiển XAMPP, **Start** cả `Apache` và `MySQL`.
+- Truy cập `http://localhost/phpmyadmin`.
+- Tạo một Database mới với tên CHÍNH XÁC là: `badminton_db`
+- *(Tuyệt đối không cần import thủ công file SQL nào, hệ thống sẽ tự động khởi tạo dữ liệu ở bước sau).*
 
-### Step-by-step Setup
-1. **Database Import:**
-   - Open phpMyAdmin (usually `http://localhost/phpmyadmin`).
-   - Create a new database named `badminton_db`.
-   - Note: You DO NOT need to import any SQL file manually. Proceed to step 2 to run the automatic database initializer.
-   *(Note: The database contains all schema and sample data required for assessment).*
+### 3. Cài đặt Backend (PHP)
+- Thầy vui lòng **copy THƯ MỤC `backend`** từ trong thư mục dự án này, và dán trực tiếp vào thư mục `htdocs` của XAMPP.
+- ⛔ **Lưu ý quan trọng:** Cấu trúc đường dẫn bắt buộc phải là: `C:\xampp\htdocs\backend\` (Việc này giúp Proxy của React gọi API mượt mà mà không bị lỗi đường dẫn).
+- Mở trình duyệt và truy cập đường link sau để khởi tạo tự động toàn bộ Bảng và Dữ liệu mẫu (Gồm 10 sân cầu lông, tài khoản admin, mã giảm giá...): 
+👉 **[http://localhost/backend/upgrade_db.php](http://localhost/backend/upgrade_db.php)**
+- Trình duyệt báo lỗi màu xanh "Thêm mới thành công" hoặc trang trắng là đã nạp dữ liệu xong.
 
-2. **Backend Setup:**
-   - Ensure you have XAMPP installed and running (Apache and MySQL).
-   - Move the entire project folder to `C:\xampp\htdocs\badminton-booking-project`.
-   - The backend API will be accessible at `http://localhost/badminton-booking-project/backend/`
-   - *Alternative (Vite proxy mode):* You can also copy the `backend` folder directly to `C:\xampp\htdocs\backend` to allow the React development server to proxy requests automatically.
-   - Run the automatic database upgrade script by visiting `http://localhost/backend/upgrade_db.php` in your browser. This will create all tables and insert sample data (including Admin and Customer accounts).
+### 4. Cài đặt Frontend (React)
+- Mở một terminal/cmd và di chuyển (cd) vào thư mục `frontend` của dự án.
+- Chạy lệnh cài đặt các thư viện Node:
+  ```bash
+  npm install
+  ```
+- Khởi động giao diện người dùng:
+  ```bash
+  npm run dev
+  ```
+- Hệ thống sẽ tự động cấp một đường link (thường là `http://localhost:5173`). Bấm vào đó để trải nghiệm hệ thống!
 
-3. **Frontend Setup:**
-   - Open a terminal and navigate to the `frontend` folder.
-   - Install dependencies: `npm install`
-   - Start the development server: `npm run dev`
-   - The application will open at `http://localhost:5173`.
+---
 
-## 5. Test Accounts
-- **Admin Account:** 
-  - Email: `admin@badminton.vn` 
-  - Password: `123456`
-- **Customer Account (Demo):**
-  - Email: `khachhang@example.com`
-  - Password: `123456`
+## 🔑 TÀI KHOẢN KIỂM THỬ (TEST ACCOUNTS)
+Hệ thống đã tự động tạo sẵn 2 tài khoản với 2 phân quyền khác nhau để thầy tiện kiểm thử các luồng chức năng:
 
-## 6. Third-Party Libraries & Assets
-- **Lucide React & Google Material Symbols:** Icons for user interfaces.
-- **TailwindCSS:** Utility-first CSS framework.
-- **Recharts (via custom SVG):** Admin dashboard charts.
-- **Unsplash:** Placeholder images for courts and news.
+**1. Quyền Quản trị viên (Chủ Sân / Admin)**
+- Đăng nhập tại màn hình `Hệ Thống Quản Trị Chủ Sân` (bấm nút Admin Góc phải trên cùng).
+- **Email:** `admin@badminton.vn`
+- **Mật khẩu:** `123456`
 
-## 7. Known Limitations
-- The system currently supports simulated QR Bank Transfer. Direct Gateway API (e.g., VNPAY/MOMO) is mocked to fit the scope of a university project.
-- Real-time WebSockets are not used; the dashboard updates on mount or via action triggers.
+**2. Quyền Khách hàng (Người đặt sân)**
+- Dùng để kiểm thử quy trình tìm sân, thanh toán, ghép kèo.
+- **Email:** `khachhang@example.com`
+- **Mật khẩu:** `123456`
 
+---
 
+## 🌟 TÍNH NĂNG NỔI BẬT (CHẤM ĐIỂM)
+1. **Thuật toán Phân trang Động (Dynamic Pagination):** Hiển thị danh sách sân với thuật toán cắt (slice) array và tự động tính tổng số trang.
+2. **Quy trình Thanh toán Mô phỏng (VietQR):** Giao diện quét mã QR động.
+3. **Mã hoá Mật khẩu An toàn (BCrypt):** Toàn bộ mật khẩu trong Database đều được băm bằng thuật toán `password_hash()` của PHP (tốt hơn MD5/SHA256).
+4. **Hệ thống lọc thông minh:** Tìm kiếm sân theo Tên, Phân loại (Sân Đơn/Đôi/VIP) và Trạng thái (Hoạt động/Bảo trì).
+5. **Giao diện Responsive:** Giao diện co giãn tự động tương thích mọi thiết bị di động với TailwindCSS và Lucide Icons.
+
+*Trân trọng cảm ơn thầy đã dành thời gian kiểm tra và đánh giá dự án của nhóm!*
