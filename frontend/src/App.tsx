@@ -132,6 +132,7 @@ export default function App() {
             playerPhone: userPhone,
             playerEmail: userEmail,
             paymentMethod: 'Tiền mặt',
+            addons: [],
             createdAt: b.created_at,
             qrCodeSeed: 'BB-' + b.id,
           }));
