@@ -36,11 +36,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const confirmedToday = todayBookings.filter(b => b.status === 'Paid' || b.status === 'CONFIRMED').length;
   const pendingToday = todayBookings.filter(b => b.status === 'Pending').length;
 
-  const revenueTodayNum = todayBookings.filter(b => b.status === 'Paid' || b.status === 'CONFIRMED').reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
+  const revenueTodayNum = stats && stats.overview.today_revenue !== undefined ? stats.overview.today_revenue : todayBookings.filter(b => b.status === 'Paid' || b.status === 'CONFIRMED').reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
   const revenueTodayStr = revenueTodayNum.toLocaleString('vi-VN');
 
   const revenueMonthNum = stats ? stats.overview.total_revenue : bookings.filter(b => b.status === 'Paid' || b.status === 'CONFIRMED').reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
-  const revenueMonthStr = (revenueMonthNum / 1000000).toFixed(1) + 'M';
+  const revenueMonthStr = revenueMonthNum >= 1000000 
+    ? (revenueMonthNum / 1000000).toFixed(2).replace(/\.00$/, '') + 'M' 
+    : (revenueMonthNum / 1000).toFixed(0) + 'K';
 
   const courtOccupancyData = [
     { name: 'Sân 1 (VIP)', percentage: 92 },

@@ -12,11 +12,17 @@ require 'db_connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
-        // 1. Tổng doanh thu (Chỉ tính những đơn đã XÁC NHẬN hoặc HOÀN THÀNH)
-        $revenueSql = "SELECT SUM(total_price) as total_revenue FROM bookings WHERE status IN ('CONFIRMED', 'COMPLETED')";
+        // 1. Tổng doanh thu (Trong tháng này)
+        $revenueSql = "SELECT SUM(total_price) as total_revenue FROM bookings WHERE status IN ('confirmed', 'completed') AND MONTH(start_time) = MONTH(CURDATE()) AND YEAR(start_time) = YEAR(CURDATE())";
         $revenueStmt = $pdo->query($revenueSql);
         $revenueResult = $revenueStmt->fetch();
         $totalRevenue = $revenueResult['total_revenue'] ?? 0;
+
+        // 1.5 Doanh thu hôm nay
+        $todayRevenueSql = "SELECT SUM(total_price) as today_revenue FROM bookings WHERE status IN ('confirmed', 'completed') AND DATE(created_at) = CURDATE()";
+        $todayRevenueStmt = $pdo->query($todayRevenueSql);
+        $todayRevenueResult = $todayRevenueStmt->fetch();
+        $todayRevenue = $todayRevenueResult['today_revenue'] ?? 0;
 
         // 2. Tổng số lượt đặt sân
         $bookingsSql = "SELECT COUNT(*) as total_bookings FROM bookings";
@@ -33,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $recentRevenueSql = "
             SELECT DATE(start_time) as date, SUM(total_price) as daily_revenue 
             FROM bookings 
-            WHERE status IN ('CONFIRMED', 'COMPLETED') 
+            WHERE status IN ('confirmed', 'completed') 
             AND start_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
             GROUP BY DATE(start_time)
             ORDER BY date ASC
@@ -65,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             "data" => [
                 "overview" => [
                     "total_revenue" => (float)$totalRevenue,
+                    "today_revenue" => (float)$todayRevenue,
                     "total_bookings" => (int)$totalBookings,
                     "occupancy_rate" => round($occupancyRate, 2),
                     "total_users" => (int)$totalUsers,
