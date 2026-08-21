@@ -32,9 +32,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const today = new Date().toISOString().split('T')[0];
   const todayBookings = bookings.filter(b => b.date && b.date.startsWith(today) || (b.date === 'Hôm nay'));
   
-  const bookingsToday = stats ? stats.overview.total_bookings : todayBookings.length;
-  const confirmedToday = todayBookings.filter(b => b.status === 'Paid' || b.status === 'CONFIRMED').length;
-  const pendingToday = todayBookings.filter(b => b.status === 'Pending').length;
+  const bookingsToday = stats && stats.overview.today_bookings !== undefined ? stats.overview.today_bookings : 0;
+  const confirmedToday = stats && stats.overview.today_confirmed !== undefined ? stats.overview.today_confirmed : 0;
+  const pendingToday = stats && stats.overview.today_pending !== undefined ? stats.overview.today_pending : 0;
 
   const revenueTodayNum = stats && stats.overview.today_revenue !== undefined ? stats.overview.today_revenue : todayBookings.filter(b => b.status === 'Paid' || b.status === 'CONFIRMED').reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
   const revenueTodayStr = revenueTodayNum.toLocaleString('vi-VN');
@@ -66,7 +66,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <p className="text-2xl lg:text-3xl font-bold text-ink tracking-tight">
               {revenueTodayStr}<span className="text-sm font-semibold ml-1.5 text-slate-700">VNĐ</span>
             </p>
-            <p className="text-xs text-slate-500 mt-0.5">24 đơn xác nhận</p>
+            <p className="text-xs text-slate-500 mt-0.5">{confirmedToday} đơn xác nhận</p>
           </div>
           <div className="w-12 h-12 rounded-full flex items-center justify-center relative z-10 shrink-0 bg-[rgba(186,106,76,0.15)]">
             <span className="material-symbols-outlined text-2xl text-earth-accent">payments</span>
@@ -201,20 +201,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <line stroke="rgba(15,23,42,0.07)" strokeDasharray="4 4" strokeWidth="1" x1="0" x2="800" y1="200" y2="200" />
               <line stroke="rgba(15,23,42,0.12)" strokeWidth="1" x1="0" x2="800" y1="250" y2="250" />
 
-              {/* Y-Axis Labels */}
-              <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="45">
-                {chartRange === '7days' ? '8M' : '150M'}
-              </text>
-              <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="95">
-                {chartRange === '7days' ? '6M' : '100M'}
-              </text>
-              <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="145">
-                {chartRange === '7days' ? '4M' : '75M'}
-              </text>
-              <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="195">
-                {chartRange === '7days' ? '2M' : '30M'}
-              </text>
-              <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="245">0</text>
+              {/* Dynamic Y-Axis Labels */}
+              {(() => {
+                const data = stats && stats.recent_revenue ? stats.recent_revenue.map((r: any) => Number(r.daily_revenue)) : [];
+                const max = Math.max(...data, 100000);
+                const format = (v: number) => v >= 1000000 ? (v/1000000).toFixed(1) + 'M' : (v/1000).toFixed(0) + 'K';
+                return (
+                  <>
+                    <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="45">{format(max)}</text>
+                    <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="95">{format(max * 0.75)}</text>
+                    <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="145">{format(max * 0.5)}</text>
+                    <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="195">{format(max * 0.25)}</text>
+                    <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="start" x="10" y="245">0</text>
+                  </>
+                );
+              })()}
 
               {/* Gradients */}
               <defs>
@@ -224,100 +225,68 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </linearGradient>
               </defs>
 
-              {/* Data Path Area */}
-              {revenueMonthNum === 0 ? (
-                <>
-                  <path
-                    d="M 0 248 L 800 248 L 800 250 L 0 250 Z"
-                    fill="url(#areaGradient)"
-                  />
-                  <path
-                    d="M 0 248 L 800 248"
-                    fill="none"
-                    stroke="var(--admin-primary)"
-                    strokeLinecap="round"
-                    strokeWidth="4"
-                  />
-                </>
-              ) : chartRange === '7days' ? (
-                <>
-                  <path
-                    d="M 0 200 C 100 200, 150 120, 266 140 C 400 160, 450 80, 533 110 C 650 140, 700 40, 800 60 L 800 250 L 0 250 Z"
-                    fill="url(#areaGradient)"
-                  />
-                  <path
-                    d="M 0 200 C 100 200, 150 120, 266 140 C 400 160, 450 80, 533 110 C 650 140, 700 40, 800 60"
-                    fill="none"
-                    stroke="var(--admin-primary)"
-                    strokeLinecap="round"
-                    strokeWidth="4"
-                  />
-                  {/* Interactive Nodes */}
-                  <circle
-                    cx="266"
-                    cy="140"
-                    fill="var(--admin-bg-card)"
-                    r="6"
-                    stroke="var(--admin-primary)"
-                    strokeWidth="3.5"
-                    className="cursor-pointer hover:r-8 transition-all"
-                    onMouseEnter={() => setHoveredPoint({ day: 'Wed (Thứ 4)', value: '4.250.000 VNĐ', x: 266, y: 140 })}
-                    onMouseLeave={() => setHoveredPoint(null)}
-                  />
-                  <circle
-                    cx="533"
-                    cy="110"
-                    fill="var(--admin-bg-card)"
-                    r="6"
-                    stroke="var(--admin-primary)"
-                    strokeWidth="3.5"
-                    className="cursor-pointer hover:r-8 transition-all"
-                    onMouseEnter={() => setHoveredPoint({ day: 'Fri (Thứ 6)', value: '5.800.000 VNĐ', x: 533, y: 110 })}
-                    onMouseLeave={() => setHoveredPoint(null)}
-                  />
-                  <circle
-                    cx="800"
-                    cy="60"
-                    fill="var(--admin-bg-card)"
-                    r="6"
-                    stroke="var(--admin-primary)"
-                    strokeWidth="3.5"
-                    className="cursor-pointer hover:r-8 transition-all"
-                    onMouseEnter={() => setHoveredPoint({ day: 'Sun (Chủ Nhật)', value: '7.850.000 VNĐ', x: 800, y: 60 })}
-                    onMouseLeave={() => setHoveredPoint(null)}
-                  />
-                </>
-              ) : (
-                <>
-                  <path
-                    d="M 0 180 C 150 190, 250 100, 380 120 C 500 140, 600 60, 800 40 L 800 250 L 0 250 Z"
-                    fill="url(#areaGradient)"
-                  />
-                  <path
-                    d="M 0 180 C 150 190, 250 100, 380 120 C 500 140, 600 60, 800 40"
-                    fill="none"
-                    stroke="var(--admin-primary)"
-                    strokeLinecap="round"
-                    strokeWidth="4"
-                  />
-                  <circle cx="380" cy="120" fill="var(--admin-bg-card)" r="6" stroke="var(--admin-primary)" strokeWidth="3.5" />
-                  <circle cx="800" cy="40" fill="var(--admin-bg-card)" r="6" stroke="var(--admin-primary)" strokeWidth="3.5" />
-                </>
-              )}
+              {/* Dynamic Data Path Area */}
+              {(() => {
+                const data = stats && stats.recent_revenue ? stats.recent_revenue.map((r: any) => Number(r.daily_revenue)) : [];
+                if (data.length === 0 || Math.max(...data) === 0) {
+                  return (
+                    <>
+                      <path d="M 0 248 L 800 248 L 800 250 L 0 250 Z" fill="url(#areaGradient)" />
+                      <path d="M 0 248 L 800 248" fill="none" stroke="var(--admin-primary)" strokeLinecap="round" strokeWidth="4" />
+                    </>
+                  );
+                }
+                const max = Math.max(...data, 100000); // minimum scale
+                const stepX = 800 / Math.max(data.length - 1, 1);
+                
+                let linePath = `M 0 ${240 - (data[0] / max) * 190}`;
+                for (let i = 1; i < data.length; i++) {
+                  linePath += ` L ${i * stepX} ${240 - (data[i] / max) * 190}`;
+                }
+                const areaPath = `${linePath} L 800 250 L 0 250 Z`;
 
-              {/* X-Axis Labels */}
-              <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="middle" x="30" y="270">
-                {chartRange === '7days' ? 'Mon' : 'Tuần 1'}
-              </text>
-              <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="middle" x="266" y="270">
-                {chartRange === '7days' ? 'Wed' : 'Tuần 2'}
-              </text>
-              <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="middle" x="533" y="270">
-                {chartRange === '7days' ? 'Fri' : 'Tuần 3'}
-              </text>
-              <text fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="middle" x="770" y="270">
-                {chartRange === '7days' ? 'Sun' : 'Tuần 4'}
-              </text>
+                return (
+                  <>
+                    <path d={areaPath} fill="url(#areaGradient)" />
+                    <path d={linePath} fill="none" stroke="var(--admin-primary)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" />
+                    {/* Draw points */}
+                    {data.map((val: number, i: number) => (
+                      <circle 
+                        key={i} 
+                        cx={i * stepX} 
+                        cy={240 - (val / max) * 190} 
+                        r="5" 
+                        fill="var(--admin-bg-card)" 
+                        stroke="var(--admin-primary)" 
+                        strokeWidth="3.5" 
+                        className="cursor-pointer hover:r-8 transition-all"
+                        onMouseEnter={() => setHoveredPoint({ 
+                          day: stats.recent_revenue[i].date, 
+                          value: val.toLocaleString('vi-VN') + ' VNĐ', 
+                          x: i * stepX, 
+                          y: 240 - (val / max) * 190 
+                        })}
+                        onMouseLeave={() => setHoveredPoint(null)}
+                      />
+                    ))}
+                  </>
+                );
+              })()}
+
+              {/* Dynamic X-Axis Labels */}
+              {(() => {
+                const dates = stats && stats.recent_revenue ? stats.recent_revenue.map((r: any) => {
+                  const d = new Date(r.date);
+                  return d.getDate() + '/' + (d.getMonth() + 1);
+                }) : [];
+                if (dates.length === 0) return null;
+                const stepX = 800 / Math.max(dates.length - 1, 1);
+                return dates.map((dateStr: string, i: number) => (
+                  <text key={i} fill="rgba(15,23,42,0.45)" fontSize="11" textAnchor="middle" x={i * stepX} y="270">
+                    {dateStr}
+                  </text>
+                ));
+              })()}
             </svg>
 
             {/* Hover Tooltip */}

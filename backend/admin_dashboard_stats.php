@@ -24,6 +24,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $todayRevenueResult = $todayRevenueStmt->fetch();
         $todayRevenue = $todayRevenueResult['today_revenue'] ?? 0;
 
+        // 1.6 Thống kê đơn hôm nay
+        $todayBookingsSql = "SELECT COUNT(*) as count FROM bookings WHERE DATE(created_at) = CURDATE()";
+        $todayBookingsCount = $pdo->query($todayBookingsSql)->fetch()['count'] ?? 0;
+
+        $todayConfirmedSql = "SELECT COUNT(*) as count FROM bookings WHERE status IN ('confirmed', 'completed') AND DATE(created_at) = CURDATE()";
+        $todayConfirmedCount = $pdo->query($todayConfirmedSql)->fetch()['count'] ?? 0;
+
+        $todayPendingSql = "SELECT COUNT(*) as count FROM bookings WHERE status = 'pending' AND DATE(created_at) = CURDATE()";
+        $todayPendingCount = $pdo->query($todayPendingSql)->fetch()['count'] ?? 0;
+
         // 2. Tổng số lượt đặt sân
         $bookingsSql = "SELECT COUNT(*) as total_bookings FROM bookings";
         $bookingsStmt = $pdo->query($bookingsSql);
@@ -73,6 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     "total_revenue" => (float)$totalRevenue,
                     "today_revenue" => (float)$todayRevenue,
                     "total_bookings" => (int)$totalBookings,
+                    "today_bookings" => (int)$todayBookingsCount,
+                    "today_confirmed" => (int)$todayConfirmedCount,
+                    "today_pending" => (int)$todayPendingCount,
                     "occupancy_rate" => round($occupancyRate, 2),
                     "total_users" => (int)$totalUsers,
                     "active_users" => (int)$activeUsers,
