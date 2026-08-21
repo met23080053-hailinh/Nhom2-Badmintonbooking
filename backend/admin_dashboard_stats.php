@@ -12,8 +12,8 @@ require 'db_connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
-        // 1. Tổng doanh thu (Trong tháng này)
-        $revenueSql = "SELECT SUM(total_price) as total_revenue FROM bookings WHERE status IN ('confirmed', 'completed') AND MONTH(start_time) = MONTH(CURDATE()) AND YEAR(start_time) = YEAR(CURDATE())";
+        // 1. Tổng doanh thu (Trong tháng này) — dùng created_at là ngày đặt tiền thực tế
+        $revenueSql = "SELECT SUM(total_price) as total_revenue FROM bookings WHERE status IN ('confirmed', 'completed') AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())";
         $revenueStmt = $pdo->query($revenueSql);
         $revenueResult = $revenueStmt->fetch();
         $totalRevenue = $revenueResult['total_revenue'] ?? 0;
@@ -45,17 +45,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $statusStmt = $pdo->query($statusSql);
         $statusDistribution = $statusStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // 4. Doanh thu theo 7 ngày gần nhất (Để vẽ biểu đồ cột/đường)
+        // 4. Doanh thu theo 7 ngày gần nhất — dùng created_at
         $recentRevenueSql = "
-            SELECT DATE(start_time) as date, SUM(total_price) as daily_revenue 
+            SELECT DATE(created_at) as date, SUM(total_price) as daily_revenue 
             FROM bookings 
             WHERE status IN ('confirmed', 'completed') 
-            AND start_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-            GROUP BY DATE(start_time)
+            AND created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+            GROUP BY DATE(created_at)
             ORDER BY date ASC
         ";
         $recentRevenueStmt = $pdo->query($recentRevenueSql);
         $recentRevenue = $recentRevenueStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 4.5. Doanh thu theo 30 ngày gần nhất — cho nút "30 Ngày"
+        $monthlyRevenueSql = "
+            SELECT DATE(created_at) as date, SUM(total_price) as daily_revenue 
+            FROM bookings 
+            WHERE status IN ('confirmed', 'completed') 
+            AND created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+            GROUP BY DATE(created_at)
+            ORDER BY date ASC
+        ";
+        $monthlyRevenueStmt = $pdo->query($monthlyRevenueSql);
+        $monthlyRevenue = $monthlyRevenueStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 4.6. Tổng số đơn chờ duyệt (pending)
+        $pendingCountSql = "SELECT COUNT(*) as count FROM bookings WHERE status = 'pending'";
+        $totalPending = $pdo->query($pendingCountSql)->fetch()['count'] ?? 0;
 
         // 5. Tỷ lệ lấp đầy sân (Đơn giản hóa: Số đơn chia cho tổng số sân)
         // Trong thực tế cần tính theo khung giờ, nhưng đây là số liệu cơ bản
@@ -92,7 +108,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     "blocked_users" => (int)$blockedUsers
                 ],
                 "status_distribution" => $statusDistribution,
-                "recent_revenue" => $recentRevenue
+                "recent_revenue" => $recentRevenue,
+                "monthly_revenue" => $monthlyRevenue,
+                "total_pending" => (int)$totalPending
             ]
         ]);
 

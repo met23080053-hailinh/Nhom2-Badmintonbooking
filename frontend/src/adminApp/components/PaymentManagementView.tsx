@@ -119,7 +119,7 @@ export const PaymentManagementView: React.FC<PaymentManagementViewProps> = ({
           </div>
           <div className="z-10 relative mt-2">
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl lg:text-4xl font-bold text-earth-primary block font-mono">{pendingCount || 18}</span>
+              <span className="text-3xl lg:text-4xl font-bold text-earth-primary block font-mono">{pendingCount}</span>
               <span className="text-sm text-earth-muted font-semibold">Giao dịch</span>
             </div>
             <span className="text-xs text-earth-muted mt-1 block">Cần xác nhận thủ công</span>

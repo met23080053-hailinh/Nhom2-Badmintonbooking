@@ -35,14 +35,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const bookingsToday = stats && stats.overview.today_bookings !== undefined ? stats.overview.today_bookings : 0;
   const confirmedToday = stats && stats.overview.today_confirmed !== undefined ? stats.overview.today_confirmed : 0;
   const pendingToday = stats && stats.overview.today_pending !== undefined ? stats.overview.today_pending : 0;
+  // Tổng đơn chờ duyệt (toàn hệ thống, không chỉ hôm nay)
+  const totalPendingAll = stats ? stats.total_pending : 0;
 
-  const revenueTodayNum = stats && stats.overview.today_revenue !== undefined ? stats.overview.today_revenue : todayBookings.filter(b => b.status === 'Paid' || b.status === 'CONFIRMED').reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
+  const revenueTodayNum = stats && stats.overview.today_revenue !== undefined ? stats.overview.today_revenue : 0;
   const revenueTodayStr = revenueTodayNum.toLocaleString('vi-VN');
 
-  const revenueMonthNum = stats ? stats.overview.total_revenue : bookings.filter(b => b.status === 'Paid' || b.status === 'CONFIRMED').reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
+  const revenueMonthNum = stats ? stats.overview.total_revenue : 0;
   const revenueMonthStr = revenueMonthNum >= 1000000 
     ? (revenueMonthNum / 1000000).toFixed(2).replace(/\.00$/, '') + 'M' 
     : (revenueMonthNum / 1000).toFixed(0) + 'K';
+
+  // Chọn đúng dataset cho biểu đồ theo chế độ
+  const chartData = chartRange === '7days'
+    ? (stats && stats.recent_revenue ? stats.recent_revenue : [])
+    : (stats && stats.monthly_revenue ? stats.monthly_revenue : []);
 
   const courtOccupancyData = [
     { name: 'Sân 1 (VIP)', percentage: 92 },
@@ -203,7 +210,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
               {/* Dynamic Y-Axis Labels */}
               {(() => {
-                const data = stats && stats.recent_revenue ? stats.recent_revenue.map((r: any) => Number(r.daily_revenue)) : [];
+                const data = chartData.map((r: any) => Number(r.daily_revenue));
                 const max = Math.max(...data, 100000);
                 const format = (v: number) => v >= 1000000 ? (v/1000000).toFixed(1) + 'M' : (v/1000).toFixed(0) + 'K';
                 return (
@@ -227,7 +234,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
               {/* Dynamic Data Path Area */}
               {(() => {
-                const data = stats && stats.recent_revenue ? stats.recent_revenue.map((r: any) => Number(r.daily_revenue)) : [];
+                const data = chartData.map((r: any) => Number(r.daily_revenue));
                 if (data.length === 0 || Math.max(...data) === 0) {
                   return (
                     <>
@@ -261,7 +268,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         strokeWidth="3.5" 
                         className="cursor-pointer hover:r-8 transition-all"
                         onMouseEnter={() => setHoveredPoint({ 
-                          day: stats.recent_revenue[i].date, 
+                          day: chartData[i]?.date ?? '', 
                           value: val.toLocaleString('vi-VN') + ' VNĐ', 
                           x: i * stepX, 
                           y: 240 - (val / max) * 190 
@@ -275,10 +282,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
               {/* Dynamic X-Axis Labels */}
               {(() => {
-                const dates = stats && stats.recent_revenue ? stats.recent_revenue.map((r: any) => {
+                const dates = chartData.map((r: any) => {
                   const d = new Date(r.date);
                   return d.getDate() + '/' + (d.getMonth() + 1);
-                }) : [];
+                });
                 if (dates.length === 0) return null;
                 const stepX = 800 / Math.max(dates.length - 1, 1);
                 return dates.map((dateStr: string, i: number) => (
