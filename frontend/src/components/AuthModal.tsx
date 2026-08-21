@@ -6,7 +6,7 @@ import { GoogleLogin } from '@react-oauth/google';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginSuccess: (userName: string, email: string, id: number) => void;
+  onLoginSuccess: (userObj: any) => void;
   intent?: 'customer' | 'admin';
 }
 
@@ -72,7 +72,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       if (data.status === 'success') {
         if (mode === 'login') {
           const userObj = data.user || data.data || {};
-          onLoginSuccess(userObj.full_name || userObj.name || fullName || 'Người dùng', userObj.email || email, userObj.id);
+          onLoginSuccess({
+            id: userObj.id,
+            name: userObj.full_name || userObj.name || fullName || 'Người dùng',
+            email: userObj.email || email,
+            phone: userObj.phone || phone || ''
+          });
           onClose();
         } else {
           setMode('login');
@@ -100,7 +105,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
       const data = await response.json();
       if (data.status === 'success') {
-        onLoginSuccess(data.user.full_name, data.user.email, data.user.id);
+        onLoginSuccess({
+          id: data.user.id,
+          name: data.user.full_name,
+          email: data.user.email,
+          phone: data.user.phone || ''
+        });
         onClose();
       } else {
         setError(data.message || 'Lỗi đăng nhập Google.');
@@ -124,7 +134,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
       const data = await res.json();
       if (data.status === 'success') {
-        onLoginSuccess(data.user.full_name, data.user.email, data.user.id);
+        onLoginSuccess({
+          id: data.user.id,
+          name: data.user.full_name,
+          email: data.user.email,
+          phone: data.user.phone || ''
+        });
         onClose();
       } else {
         setError(data.message || 'Lỗi đăng nhập Facebook.');

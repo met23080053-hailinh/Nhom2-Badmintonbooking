@@ -4,15 +4,17 @@ import { User, Mail, Phone, Shield, Calendar, CreditCard, Activity, MapPin, User
 interface ProfileProps {
   userId: number | null;
   userName: string;
+  userEmail: string;
   userPhone: string;
   userRole: 'customer' | 'admin';
-  onProfileUpdate: (name: string, phone: string) => void;
+  onProfileUpdate: (name: string, phone: string, email: string) => void;
 }
 
-export const Profile: React.FC<ProfileProps> = ({ userId, userName, userPhone, userRole, onProfileUpdate }) => {
+export const Profile: React.FC<ProfileProps> = ({ userId, userName, userEmail, userPhone, userRole, onProfileUpdate }) => {
   const [activeTab, setActiveTab] = useState<'info' | 'password'>('info');
 
   const [editName, setEditName] = useState(userName);
+  const [editEmail, setEditEmail] = useState(userEmail);
   const [editPhone, setEditPhone] = useState(userPhone);
 
   const [currentPassword, setCurrentPassword] = useState('');
@@ -30,19 +32,15 @@ export const Profile: React.FC<ProfileProps> = ({ userId, userName, userPhone, u
     setIsSubmitting(true);
     setInfoMessage(null);
     try {
-      const res = await fetch(`/backend/update_profile.php`, {
+      const res = await fetch('/backend/update_profile.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: userId,
-          full_name: editName,
-          phone: editPhone
-        })
+        body: JSON.stringify({ user_id: userId, name: editName, phone: editPhone, email: editEmail })
       });
       const data = await res.json();
       if (data.status === 'success') {
-        setInfoMessage({ type: 'success', text: data.message });
-        onProfileUpdate(editName, editPhone);
+        setInfoMessage({ type: 'success', text: 'Cập nhật thông tin thành công!' });
+        onProfileUpdate(editName, editPhone, editEmail);
       } else {
         setInfoMessage({ type: 'error', text: data.message });
       }
@@ -165,6 +163,16 @@ export const Profile: React.FC<ProfileProps> = ({ userId, userName, userPhone, u
                           className="w-full px-4 py-2.5 rounded-xl border border-ink/20 focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
                           required
                         />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-ink/80 mb-1">Email</label>
+                        <input
+                          type="email"
+                          value={editEmail}
+                          disabled
+                          className="w-full px-4 py-2.5 rounded-xl border border-ink/20 bg-slate-100 text-ink/60 cursor-not-allowed focus:outline-hidden"
+                        />
+                        <p className="text-[11px] text-ink/50 mt-1">Email không thể thay đổi để bảo mật tài khoản.</p>
                       </div>
                       <div>
                         <label className="block text-sm font-bold text-ink/80 mb-1">Số điện thoại</label>

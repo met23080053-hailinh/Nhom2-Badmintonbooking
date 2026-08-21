@@ -52,6 +52,7 @@ export default function App() {
   const [userName, setUserName] = useState(savedUser?.userName || '');
   const [userRole, setUserRole] = useState<'customer' | 'admin'>(savedUser?.userRole || 'customer');
   const [userEmail, setUserEmail] = useState(savedUser?.userEmail || '');
+  const [userPhone, setUserPhone] = useState(savedUser?.userPhone || '');
   const [userId, setUserId] = useState<number | null>(savedUser?.userId || null);
 
   const [courts, setCourts] = useState<any[]>(MOCK_COURTS);
@@ -180,26 +181,25 @@ export default function App() {
     );
   };
 
-  const handleLogin = (nameOrUser: any, emailArg?: string, idArg?: number | string) => {
+  const handleLogin = (userObj: any) => {
     let name = '';
     let email = '';
+    let phone = '';
     let id: number | null = null;
     let role = 'customer';
 
-    if (typeof nameOrUser === 'string') {
-      name = nameOrUser;
-      email = emailArg || '';
-      if (idArg) id = Number(idArg);
-    } else if (nameOrUser) {
-      name = nameOrUser.full_name || nameOrUser.name || 'Người dùng';
-      email = nameOrUser.email || '';
-      role = nameOrUser.role || 'customer';
-      if (nameOrUser.id) id = Number(nameOrUser.id);
+    if (userObj) {
+      name = userObj.full_name || userObj.name || 'Người dùng';
+      email = userObj.email || '';
+      phone = userObj.phone || '';
+      role = userObj.role || 'customer';
+      if (userObj.id) id = Number(userObj.id);
     }
 
     setIsLoggedIn(true);
     setUserName(name);
     setUserEmail(email);
+    setUserPhone(phone);
     setUserId(id);
     
     // Admin login via "Chủ sân" button sets intent to 'admin'.
@@ -226,6 +226,7 @@ export default function App() {
       userName: name,
       userRole: finalRole,
       userEmail: email,
+      userPhone: phone,
       userId: id
     }));
 
@@ -268,6 +269,7 @@ export default function App() {
     setUserName('Guest');
     setUserRole('customer');
     setUserEmail('');
+    setUserPhone('');
     setUserId(null);
     setUserBookings([]); 
     setCurrentTab('home');
@@ -357,11 +359,15 @@ export default function App() {
           <Profile 
             userId={userId}
             userName={userName} 
-            userPhone={userEmail} 
+            userEmail={userEmail}
+            userPhone={userPhone} 
             userRole="customer" 
-            onProfileUpdate={(name, phone) => {
+            onProfileUpdate={(name, phone, email) => {
               setUserName(name);
-              setUserEmail(phone);
+              setUserEmail(email);
+              setUserPhone(phone);
+              const current = JSON.parse(localStorage.getItem('userState') || '{}');
+              localStorage.setItem('userState', JSON.stringify({ ...current, userName: name, userPhone: phone, userEmail: email }));
             }}
           />
         )}
@@ -486,7 +492,7 @@ export default function App() {
         isLoggedIn={isLoggedIn}
         userId={userId}
         userName={userName}
-        userPhone={userEmail} /* Need to fix phone passing */
+        userPhone={userPhone}
         onRequireLogin={() => {
           setAuthIntent('customer');
           setIsAuthModalOpen(true);
