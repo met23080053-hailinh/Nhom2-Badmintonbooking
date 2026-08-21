@@ -50,7 +50,13 @@ export const CourtListView: React.FC<CourtListViewProps> = ({
         }
         // Surface filter
         if (selectedSurface !== 'Tất cả mặt sân') {
-          const hasSurface = court.subCourts.some((sc) => sc.surface === selectedSurface);
+          const hasSurface = court.subCourts.some((sc) => {
+            const scSurface = sc.surface.toLowerCase();
+            if (selectedSurface === 'Thảm Taraflex BWF') return scSurface.includes('taraflex');
+            if (selectedSurface === 'Sàn Gỗ') return scSurface.includes('timber') || scSurface.includes('gỗ');
+            if (selectedSurface === 'Sàn PVC') return scSurface.includes('pvc');
+            return sc.surface === selectedSurface;
+          });
           if (!hasSurface) return false;
         }
         return true;
