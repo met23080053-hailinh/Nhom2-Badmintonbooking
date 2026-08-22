@@ -80,6 +80,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           });
           onClose();
         } else {
+          alert('Đăng ký tài khoản thành công! Vui lòng đăng nhập.');
           setMode('login');
           setPassword('');
         }
@@ -264,12 +265,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-earth-main/40 text-lg">mail</span>
               <input
-                type="email"
+                type={mode === 'login' ? "text" : "email"}
                 required={mode === 'login'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-3 py-3 text-sm rounded-xl border border-earth focus:outline-none focus:border-earth-primary"
-                placeholder={mode === 'register' ? "Email (tùy chọn)" : "Email *"}
+                placeholder={mode === 'register' ? "Email (tùy chọn)" : "Email hoặc Số điện thoại *"}
               />
             </div>
           </div>

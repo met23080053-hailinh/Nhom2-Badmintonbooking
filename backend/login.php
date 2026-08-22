@@ -16,17 +16,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"));
 
     if (!empty($data->email) && !empty($data->password)) {
-        $email = filter_var($data->email, FILTER_SANITIZE_EMAIL);
+        // Here, the frontend might send a phone number in the 'email' field.
+        $login_identifier = htmlspecialchars(strip_tags($data->email));
         $password = $data->password;
 
         try {
-            // Tìm người dùng theo Email
-            $sql = "SELECT id, full_name, email, password_hash, role FROM users WHERE email = ?";
+            // Tìm người dùng theo Email hoặc Số điện thoại
+            $sql = "SELECT id, full_name, email, phone, password_hash, role FROM users WHERE email = ? OR phone = ?";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$email]);
+            $stmt->execute([$login_identifier, $login_identifier]);
             $user = $stmt->fetch();
 
-            // Nếu tìm thấy email VÀ mật khẩu nhập vào khớp với mã hash trong CSDL
+            // Nếu tìm thấy người dùng VÀ mật khẩu nhập vào khớp với mã hash trong CSDL
             if ($user && password_verify($password, $user['password_hash'])) {
                 
                 // Xóa password_hash trước khi trả dữ liệu về Frontend để bảo mật
