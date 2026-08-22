@@ -6,6 +6,7 @@ interface MyBookingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   bookings: BookingRecord[];
+  walletBalance?: number;
   onCancelBooking: (id: string) => void;
   onBookMore: () => void;
 }
@@ -14,6 +15,7 @@ export const MyBookingsModal: React.FC<MyBookingsModalProps> = ({
   isOpen,
   onClose,
   bookings,
+  walletBalance = 0,
   onCancelBooking,
   onBookMore,
 }) => {
@@ -36,9 +38,14 @@ export const MyBookingsModal: React.FC<MyBookingsModalProps> = ({
         <div className="bg-white border-b border-zinc-100 p-5 sm:p-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold tracking-tight text-primary">Sân Đã Đặt & Thẻ QR Điện Tử</h2>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Xuất trình thẻ QR này tại cổng vào hoặc quầy lễ tân
-            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-zinc-500">
+                Xuất trình thẻ QR này tại cổng vào hoặc quầy lễ tân
+              </span>
+              <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-bold">
+                Ví của bạn: {walletBalance.toLocaleString('vi-VN')} VNĐ
+              </span>
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -137,10 +144,14 @@ export const MyBookingsModal: React.FC<MyBookingsModalProps> = ({
                       <span>Xem Mã QR Điện Tử</span>
                     </button>
 
-                    {b.status === 'ĐÃ XÁC NHẬN' && (
+                    {b.status !== 'CANCELLED' && new Date(b.date + 'T' + b.timeSlots[0]) > new Date() && (
                       <button
                         type="button"
-                        onClick={() => onCancelBooking(b.id)}
+                        onClick={() => {
+                          if (window.confirm("Bạn có chắc chắn muốn hủy đơn? Nếu hủy trước 4 tiếng, bạn sẽ được hoàn 100% vào Ví. Nếu hủy sát giờ, bạn sẽ bị mất tiền phí.")) {
+                            onCancelBooking(b.id);
+                          }
+                        }}
                         className="text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

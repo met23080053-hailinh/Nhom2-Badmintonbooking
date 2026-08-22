@@ -14,6 +14,7 @@ try {
         password_hash VARCHAR(255) NOT NULL,
         phone VARCHAR(20),
         role ENUM('customer', 'admin') DEFAULT 'customer',
+        wallet_balance DECIMAL(10,2) DEFAULT 0.00,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ");
@@ -104,22 +105,23 @@ try {
 
     // 3. Tạo bảng Bookings
     $pdo->exec("
-    CREATE TABLE IF NOT EXISTS bookings (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        booking_code VARCHAR(50),
-        user_id INT NOT NULL,
-        court_id INT NOT NULL,
-        start_time DATETIME NOT NULL,
-        end_time DATETIME NOT NULL,
-        player_name VARCHAR(255) DEFAULT '',
-        player_phone VARCHAR(20) DEFAULT '',
-        total_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-        status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'pending',
-        payment_status ENUM('unpaid', 'paid') DEFAULT 'unpaid',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (court_id) REFERENCES courts(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        CREATE TABLE IF NOT EXISTS bookings (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            booking_code VARCHAR(50) NOT NULL UNIQUE,
+            user_id INT NOT NULL,
+            court_id INT NOT NULL,
+            start_time DATETIME NOT NULL,
+            end_time DATETIME NOT NULL,
+            player_name VARCHAR(255) DEFAULT '',
+            player_phone VARCHAR(20) DEFAULT '',
+            total_price DECIMAL(10,2) NOT NULL,
+            refund_amount DECIMAL(10,2) DEFAULT 0.00,
+            status ENUM('pending', 'confirmed', 'cancelled', 'completed') DEFAULT 'pending',
+            payment_status ENUM('unpaid', 'paid') DEFAULT 'unpaid',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (court_id) REFERENCES courts(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ");
 
     // 4. Tạo bảng Promotions

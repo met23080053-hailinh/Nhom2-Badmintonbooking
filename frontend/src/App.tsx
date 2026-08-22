@@ -38,7 +38,8 @@ export default function App() {
   const [selectedCourtForBooking, setSelectedCourtForBooking] = useState<CourtFacility | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isBookingsDrawerOpen, setIsBookingsDrawerOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [userBookings, setUserBookings] = useState<BookingRecord[]>([]);
+  const [walletBalance, setWalletBalance] = useState<number>(0);
   const [authIntent, setAuthIntent] = useState<'customer' | 'admin'>('customer');
   const [policyModalTitle, setPolicyModalTitle] = useState<string | null>(null);
 
@@ -107,8 +108,6 @@ export default function App() {
 
     return () => clearInterval(intervalId); // Dọn dẹp khi component unmount
   }, []);
-
-  const [userBookings, setUserBookings] = useState<BookingRecord[]>([]);
 
   const refreshBookings = React.useCallback(() => {
     if (!userId) return;
@@ -184,9 +183,31 @@ export default function App() {
   };
 
   const handleCancelBooking = (bookingId: string) => {
-    setUserBookings((prev) =>
-      prev.map((b) => (b.id === bookingId ? { ...b, status: 'CANCELLED' } : b))
-    );
+    if (!userId) return;
+    
+    // Call API to cancel
+    fetch('http://localhost/backend/cancel_booking.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_id: bookingId, user_id: userId })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        alert(data.message);
+        // Cập nhật lại UI
+        setUserBookings((prev) =>
+          prev.map((b) => (b.id === bookingId ? { ...b, status: 'CANCELLED' } : b))
+        );
+        // Cập nhật ví nếu có hoàn tiền
+        if (data.refund_amount > 0) {
+          setWalletBalance(prev => prev + data.refund_amount);
+        }
+      } else {
+        alert("Lỗi: " + data.message);
+      }
+    })
+    .catch(err => console.error(err));
   };
 
   const handleLogin = (userObj: any) => {
@@ -268,6 +289,16 @@ export default function App() {
           }
         })
         .catch(err => console.error("Lỗi lấy lịch sử:", err));
+        
+      // Fetch user info for wallet
+      fetch(`/backend/get_user_info.php?user_id=${id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success' && data.data) {
+            setWalletBalance(parseFloat(data.data.wallet_balance) || 0);
+          }
+        })
+        .catch(console.error);
     }
     setIsAuthModalOpen(false);
   };
@@ -280,6 +311,7 @@ export default function App() {
     setUserPhone('');
     setUserId(null);
     setUserBookings([]); 
+    setWalletBalance(0);
     setCurrentTab('home');
     localStorage.removeItem('userState');
   };
@@ -514,6 +546,7 @@ export default function App() {
         isOpen={isBookingsDrawerOpen}
         onClose={() => setIsBookingsDrawerOpen(false)}
         bookings={userBookings}
+        walletBalance={walletBalance}
         onCancelBooking={handleCancelBooking}
         onBookMore={() => {
           setCurrentTab('courts');

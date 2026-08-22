@@ -67,33 +67,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $total_price = $duration_hours * $court_data['price_per_hour'];
 
+            // Lấy ví người dùng
+            $stmtWallet = $pdo->prepare("SELECT wallet_balance FROM users WHERE id = ? FOR UPDATE");
+            $stmtWallet->execute([$user_id]);
+            $user_wallet = $stmtWallet->fetchColumn();
+            
+            $amount_to_pay = $total_price;
+            $wallet_used = 0;
+            $status = 'PENDING';
+
+            if ($user_wallet > 0) {
+                if ($user_wallet >= $total_price) {
+                    $wallet_used = $total_price;
+                    $amount_to_pay = 0;
+                    $status = 'CONFIRMED';
+                } else {
+                    $wallet_used = $user_wallet;
+                    $amount_to_pay = $total_price - $user_wallet;
+                }
+            }
+
             // 2. TẠO MÃ ĐẶT SÂN TỰ ĐỘNG VÀ LƯU VÀO CSDL
             // Tạo mã có dạng: BKG-YYYYMMDD-HệSốNgẫuNhiên
             $booking_code = 'BKG-' . date('Ymd') . '-' . rand(1000, 9999);
 
-            $insert_sql = "INSERT INTO bookings (booking_code, user_id, court_id, start_time, end_time, total_price, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')";
+            $insert_sql = "INSERT INTO bookings (booking_code, user_id, court_id, start_time, end_time, total_price, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
             $insert_stmt = $pdo->prepare($insert_sql);
             
-            if ($insert_stmt->execute([$booking_code, $user_id, $court_id, $start_time, $end_time, $total_price])) {
+            if ($insert_stmt->execute([$booking_code, $user_id, $court_id, $start_time, $end_time, $total_price, $status])) {
                 $booking_id = $pdo->lastInsertId(); // Lấy ID của đơn vừa đặt
                 
-                // 3. TẠO MÃ VIETQR
-                // Template VietQR: https://img.vietqr.io/image/{bank}-{account}-{template}.png?amount={amount}&addInfo={content}&accountName={name}
-                $bank_id = "MB"; // Ngân hàng MB Bank
-                $account_no = "0987654321"; // STK Demo
-                $account_name = "NGUYEN VAN A";
-                
-                $qr_url = "https://img.vietqr.io/image/{$bank_id}-{$account_no}-compact2.png?amount={$total_price}&addInfo={$booking_code}&accountName=" . urlencode($account_name);
+                // Trừ tiền trong ví nếu có sử dụng
+                if ($wallet_used > 0) {
+                    $stmtUpdateWallet = $pdo->prepare("UPDATE users SET wallet_balance = wallet_balance - ? WHERE id = ?");
+                    $stmtUpdateWallet->execute([$wallet_used, $user_id]);
+                }
+
+                // 3. TẠO MÃ VIETQR (Chỉ tạo nếu còn phải trả tiền)
+                $qr_url = null;
+                if ($amount_to_pay > 0) {
+                    // Template VietQR: https://img.vietqr.io/image/{bank}-{account}-{template}.png?amount={amount}&addInfo={content}&accountName={name}
+                    $bank_id = "MB"; // Ngân hàng MB Bank
+                    $account_no = "0987654321"; // STK Demo
+                    $account_name = "NGUYEN VAN A";
+                    
+                    $qr_url = "https://img.vietqr.io/image/{$bank_id}-{$account_no}-compact2.png?amount={$amount_to_pay}&addInfo={$booking_code}&accountName=" . urlencode($account_name);
+                }
 
                 http_response_code(201);
+                $msg = $amount_to_pay > 0 
+                       ? "Đặt sân thành công! Vui lòng thanh toán số tiền còn lại." 
+                       : "Đặt sân thành công! Hệ thống đã trừ tiền trong ví và tự động xác nhận đơn.";
+
                 echo json_encode([
                     "status" => "success", 
-                    "message" => "Đặt sân thành công!",
+                    "message" => $msg,
                     "data" => [
                         "booking_id" => $booking_id,
                         "booking_code" => $booking_code,
                         "total_price" => $total_price,
-                        "payment_qr_url" => $qr_url
+                        "wallet_used" => $wallet_used,
+                        "amount_to_pay" => $amount_to_pay,
+                        "payment_qr_url" => $qr_url,
+                        "booking_status" => $status
                     ]
                 ]);
             } else {

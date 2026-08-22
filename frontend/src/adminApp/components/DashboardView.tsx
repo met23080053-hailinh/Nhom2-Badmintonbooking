@@ -61,8 +61,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div className="flex flex-col w-full gap-6 pb-12 animate-in fade-in duration-300">
-      {/* 4 Metric Cards Bento Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Metric Cards Bento Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {/* Card 1: Doanh Thu Hôm Nay */}
         <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-100 shadow-sm p-5 shadow-md flex items-center justify-between relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-slate-50/50 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
@@ -118,7 +118,24 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* Card 4: Tỉ Lệ Lấp Đầy */}
+        {/* Card 4: Hoàn tiền khách hàng */}
+        <div className="bg-gradient-to-br from-red-50 to-white rounded-xl border border-red-100 shadow-sm p-5 shadow-md flex items-center justify-between relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-slate-50/50 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+          <div className="flex flex-col gap-1.5 relative z-10">
+            <p className="text-[#94a3b8]/80 uppercase tracking-wider font-semibold text-xs">
+              Tiền Hoàn Khách
+            </p>
+            <p className="text-2xl lg:text-3xl font-bold text-ink tracking-tight">
+              {(stats?.overview?.total_refunds || 0).toLocaleString('vi-VN')}
+            </p>
+            <p className="text-xs text-slate-500 mt-0.5">Hoàn 100% vào ví (Quy tắc 4h)</p>
+          </div>
+          <div className="w-12 h-12 rounded-full flex items-center justify-center relative z-10 shrink-0 bg-red-100/50">
+            <span className="material-symbols-outlined text-2xl text-red-500">money_off</span>
+          </div>
+        </div>
+
+        {/* Card 5: Tỉ Lệ Lấp Đầy */}
         <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl border border-purple-100 shadow-sm p-5 shadow-md flex flex-col justify-between relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-slate-50/50 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
           <div className="flex justify-between items-center relative z-10 mb-2">

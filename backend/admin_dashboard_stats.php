@@ -73,6 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $pendingCountSql = "SELECT COUNT(*) as count FROM bookings WHERE status = 'pending'";
         $totalPending = $pdo->query($pendingCountSql)->fetch()['count'] ?? 0;
 
+        // 4.7. Tổng số tiền đã hoàn trả (Customer Refunds)
+        $refundSql = "SELECT SUM(refund_amount) as total_refunds FROM bookings WHERE status = 'cancelled'";
+        $totalRefunds = $pdo->query($refundSql)->fetch()['total_refunds'] ?? 0;
+
         // 5. Tỷ lệ lấp đầy sân (Đơn giản hóa: Số đơn chia cho tổng số sân)
         // Trong thực tế cần tính theo khung giờ, nhưng đây là số liệu cơ bản
         $courtsSql = "SELECT COUNT(*) as total_courts FROM courts";
@@ -98,6 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 "overview" => [
                     "total_revenue" => (float)$totalRevenue,
                     "today_revenue" => (float)$todayRevenue,
+                    "total_refunds" => (float)$totalRefunds,
                     "total_bookings" => (int)$totalBookings,
                     "today_bookings" => (int)$todayBookingsCount,
                     "today_confirmed" => (int)$todayConfirmedCount,
