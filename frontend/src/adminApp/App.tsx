@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './index.css';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -60,7 +60,8 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
 
   const [payments, setPayments] = useState<PaymentTransaction[]>([]);
 
-  React.useEffect(() => {
+  // Fetch bookings function — extracted so we can call it manually + periodically
+  const fetchBookings = useCallback(() => {
     fetch(`/backend/get_bookings.php`)
       .then(res => res.json())
       .then(data => {
@@ -75,7 +76,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
             startTime: b.start_time.split(' ')[1].substring(0,5),
             endTime: b.end_time.split(' ')[1].substring(0,5),
             amount: Number(b.total_price),
-            status: b.status === 'confirmed' ? 'Paid' : 'Pending',
+            status: b.status === 'confirmed' ? 'Paid' : b.status === 'cancelled' ? 'Cancelled' : 'Pending',
             paymentMethod: 'VietQR',
             createdAt: b.created_at
           }));
@@ -99,6 +100,13 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
       })
       .catch(err => console.error(err));
   }, []);
+
+  // Initial fetch + auto-refresh every 30 seconds
+  useEffect(() => {
+    fetchBookings();
+    const interval = setInterval(fetchBookings, 30000);
+    return () => clearInterval(interval);
+  }, [fetchBookings]);
 
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -483,6 +491,7 @@ export function AdminApp({ onLogout }: { onLogout?: () => void }) {
             onUpdateBookingStatus={handleUpdateBookingStatus}
             onAddBooking={handleAddBooking}
             onShowToast={showToast}
+            onRefresh={fetchBookings}
           />
         )}
 

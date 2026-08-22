@@ -9,6 +9,7 @@ interface BookingManagementViewProps {
   onUpdateBookingStatus: (bookingId: string, newStatus: BookingStatus) => void;
   onAddBooking: (booking: Booking) => void;
   onShowToast: (title: string, desc?: string, type?: 'success' | 'info' | 'warning' | 'error') => void;
+  onRefresh?: () => void;
 }
 
 export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
@@ -19,6 +20,7 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
   onUpdateBookingStatus,
   onAddBooking,
   onShowToast,
+  onRefresh,
 }) => {
   const [viewMode, setViewMode] = useState<'week' | 'month' | 'day'>('week');
   const [selectedCourtFilter, setSelectedCourtFilter] = useState<string>('all');
@@ -230,6 +232,19 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
             <span className="material-symbols-outlined text-lg">add</span>
             ĐẶT SÂN THỦ CÔNG
           </button>
+
+          {/* Refresh Button */}
+          {onRefresh && (
+            <button
+              id="btn-refresh-bookings"
+              onClick={onRefresh}
+              title="Làm mới dữ liệu"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs border border-earth hover:bg-earth-primary-light text-earth-main transition-all"
+            >
+              <span className="material-symbols-outlined text-lg">refresh</span>
+              Làm Mới
+            </button>
+          )}
         </div>
       </div>
 
@@ -357,11 +372,12 @@ export const BookingManagementView: React.FC<BookingManagementViewProps> = ({
                 })()}
 
                 {/* Dynamic Bookings on Grid */}
-                {[1, 2, 3, 4, 5, 6, 0].map((dayOfWeek, colIndex) => {
+                {daysHeader.map((day, colIndex) => {
+                  // Filter bookings whose ACTUAL DATE matches this specific day in the displayed week
                   const dayBookings = filteredBookings.filter(b => {
                     if (!b.date) return false;
-                    const d = new Date(b.date);
-                    return d.getDay() === dayOfWeek;
+                    // b.date is 'YYYY-MM-DD', day.fullDate is also 'YYYY-MM-DD'
+                    return b.date === day.fullDate;
                   });
 
                   return (
