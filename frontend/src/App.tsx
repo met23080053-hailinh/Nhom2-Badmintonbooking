@@ -38,6 +38,7 @@ export default function App() {
   const [selectedCourtForBooking, setSelectedCourtForBooking] = useState<CourtFacility | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isBookingsDrawerOpen, setIsBookingsDrawerOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [userBookings, setUserBookings] = useState<BookingRecord[]>([]);
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [authIntent, setAuthIntent] = useState<'customer' | 'admin'>('customer');
