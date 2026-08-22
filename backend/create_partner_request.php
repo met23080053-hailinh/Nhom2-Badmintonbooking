@@ -40,6 +40,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
+        // Kiểm tra xem user này đã tạo một nhóm nào OPEN chưa
+        $stmt_check_host = $pdo->prepare("SELECT id FROM matchmaking WHERE user_id = ? AND status = 'OPEN'");
+        $stmt_check_host->execute([$user_id]);
+        if ($stmt_check_host->rowCount() > 0) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Bạn đã tạo một nhóm đang tìm người. Vui lòng hoàn thành hoặc đóng nhóm cũ trước khi tạo mới!"]);
+            exit;
+        }
+
+        // Kiểm tra xem user này có đang tham gia nhóm nào OPEN không (dựa trên SĐT liên hệ nếu có)
+        if ($contact_phone) {
+            $stmt_check_joined = $pdo->prepare("
+                SELECT mp.id 
+                FROM matchmaking_participants mp
+                JOIN matchmaking m ON mp.matchmaking_id = m.id
+                WHERE mp.user_phone = ? AND m.status = 'OPEN'
+            ");
+            $stmt_check_joined->execute([$contact_phone]);
+            if ($stmt_check_joined->rowCount() > 0) {
+                http_response_code(400);
+                echo json_encode(["status" => "error", "message" => "Bạn đang tham gia một nhóm khác chưa bắt đầu. Không thể tạo nhóm mới lúc này!"]);
+                exit;
+            }
+        }
+
         // If we want to store phone in the matchmaking table, we need to alter it again. But let's just store it in `note` for now if we didn't create a column!
         // No, I will just append it to the note:
         if ($contact_phone) {

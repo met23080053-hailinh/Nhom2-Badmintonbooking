@@ -26,6 +26,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
+        // Kiểm tra xem người dùng này đã tham gia một nhóm nào đang OPEN chưa
+        $stmt_check_joined = $pdo->prepare("
+            SELECT mp.id 
+            FROM matchmaking_participants mp
+            JOIN matchmaking m ON mp.matchmaking_id = m.id
+            WHERE mp.user_phone = ? AND m.status = 'OPEN'
+        ");
+        $stmt_check_joined->execute([$user_phone]);
+        if ($stmt_check_joined->rowCount() > 0) {
+            $pdo->rollBack();
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Bạn đang tham gia một nhóm khác chưa bắt đầu. Chỉ được phép tham gia 1 nhóm tại một thời điểm!"]);
+            exit;
+        }
+
         // Kiểm tra xem nhóm còn chỗ không
         $stmt_check = $pdo->prepare("SELECT spots_needed, spots_filled FROM matchmaking WHERE id = ? FOR UPDATE");
         $stmt_check->execute([$matchmaking_id]);
